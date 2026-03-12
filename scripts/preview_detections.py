@@ -14,7 +14,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 from mask_engine.config import load_config
 from mask_engine.ocr import run_ocr
 from mask_engine.detector import detect_sensitive
@@ -45,7 +45,10 @@ def main():
 
     config = load_config(args.config)
     image = Image.open(args.input)
-    ocr_results = run_ocr(image, config.ocr.languages, config.ocr.min_confidence, config.ocr.engine)
+    ocr_results = run_ocr(
+        image, config.ocr.languages, config.ocr.min_confidence,
+        config.ocr.engine, multi_preprocess=config.ocr.multi_preprocess,
+    )
     detections = detect_sensitive(ocr_results, config.detection_rules)
 
     preview = image.copy()

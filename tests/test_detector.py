@@ -12,6 +12,7 @@ def _make_rules():
         DetectionRule(name="EMAIL", pattern=r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", description="Email", enabled=True),
         DetectionRule(name="IP_ADDRESS", pattern=r"(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)", description="IP", enabled=True),
         DetectionRule(name="BIRTHDAY", pattern=r"(?:19|20)\d{2}[\s./-](?:0?[1-9]|1[0-2])[\s./-](?:0?[1-9]|[12]\d|3[01])", description="Birthday", enabled=True),
+        DetectionRule(name="BANK_CARD", pattern=r"(?:62|4\d|5[1-5])\d{2}[\s.,-]?\d{4}[\s.,-]?\d{4}[\s.,-]?\d{4}(?:[\s.,-]?\d{1,3})?", description="Bank card", enabled=True),
     ]
 
 
@@ -122,3 +123,46 @@ class TestDetectSensitive:
         ]
         dets = detect_sensitive(ocr, _make_rules())
         assert len(dets) == 2
+
+
+class TestDotNormalization:
+    """Test dot-normalization second pass in detect_sensitive."""
+
+    def test_dot_separated_phone(self):
+        """Phone number with dots between digit groups (OCR noise) should be detected."""
+        ocr = [_make_ocr("138.1234.5678", 10, 10, w=120)]
+        rules = [DetectionRule(name="PHONE_CN", pattern=r"1[3-9]\d[\s-]?\d{4}[\s-]?\d{4}", description="Phone", enabled=True)]
+        dets = detect_sensitive(ocr, rules)
+        assert len(dets) == 1
+        assert dets[0].label == "PHONE_CN"
+
+    def test_dot_separated_bank_card(self):
+        """Bank card number with dots should be detected via normalization."""
+        ocr = [_make_ocr("6222.0200.1234.5678", 10, 10, w=200)]
+        rules = [DetectionRule(
+            name="BANK_CARD",
+            pattern=r"(?:62|4\d|5[1-5])\d{2}[\s.,-]?\d{4}[\s.,-]?\d{4}[\s.,-]?\d{4}(?:[\s.,-]?\d{1,3})?",
+            description="Bank card", enabled=True,
+        )]
+        dets = detect_sensitive(ocr, rules)
+        assert len(dets) >= 1
+        assert any(d.label == "BANK_CARD" for d in dets)
+
+    def test_no_false_normalization_on_ip(self):
+        """IP addresses should still be detected normally (dots are valid)."""
+        ocr = [_make_ocr("192.168.1.100", 10, 10, w=120)]
+        rules = [DetectionRule(
+            name="IP_ADDRESS",
+            pattern=r"(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)",
+            description="IP", enabled=True,
+        )]
+        dets = detect_sensitive(ocr, rules)
+        assert len(dets) == 1
+        assert dets[0].label == "IP_ADDRESS"
+
+    def test_no_dots_no_change(self):
+        """Text without digit-dot-digit should not trigger normalization."""
+        ocr = [_make_ocr("Hello World", 10, 10, w=100)]
+        rules = _make_rules()
+        dets = detect_sensitive(ocr, rules)
+        assert len(dets) == 0

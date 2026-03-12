@@ -71,7 +71,10 @@ def run_pipeline(
 
     image = Image.open(input_path)
 
-    ocr_results = run_ocr(image, config.ocr.languages, config.ocr.min_confidence, config.ocr.engine)
+    ocr_results = run_ocr(
+        image, config.ocr.languages, config.ocr.min_confidence,
+        config.ocr.engine, multi_preprocess=config.ocr.multi_preprocess,
+    )
 
     detections = detect_sensitive(ocr_results, config.detection_rules)
 

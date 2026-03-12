@@ -22,6 +22,7 @@ class OcrConfig:
     engine: str = "combined"  # "tesseract", "rapidocr", or "combined"
     languages: str = "eng+chi_sim"
     min_confidence: int = 30
+    multi_preprocess: bool = True  # run OCR with multiple preprocessing strategies
 
 
 @dataclass
@@ -74,6 +75,7 @@ def load_config(config_path: str | None = None) -> Config:
         engine=ocr_data.get("engine", "combined"),
         languages=ocr_data.get("languages", "eng+chi_sim"),
         min_confidence=ocr_data.get("min_confidence", 30),
+        multi_preprocess=ocr_data.get("multi_preprocess", True),
     )
 
     output_data = data.get("output", {})

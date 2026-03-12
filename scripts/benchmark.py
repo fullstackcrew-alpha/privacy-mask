@@ -19,10 +19,12 @@ from dataclasses import dataclass, field
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
+from mask_engine.bbox import bbox_iou
 from mask_engine.config import load_config
-from mask_engine.ocr import run_ocr
 from mask_engine.detector import detect_sensitive, Detection
+from mask_engine.fonts import get_font
+from mask_engine.ocr import run_ocr
 
 
 # ---------------------------------------------------------------------------
@@ -68,28 +70,6 @@ def _text_overlap(det_text: str, gt_text: str) -> bool:
     return gtt in dt or dt in gtt
 
 
-def _bbox_iou(a: tuple | list, b: tuple | list) -> float:
-    """Compute IoU between two (x, y, w, h) bounding boxes."""
-    ax1, ay1 = a[0], a[1]
-    ax2, ay2 = a[0] + a[2], a[1] + a[3]
-    bx1, by1 = b[0], b[1]
-    bx2, by2 = b[0] + b[2], b[1] + b[3]
-
-    ix1 = max(ax1, bx1)
-    iy1 = max(ay1, by1)
-    ix2 = min(ax2, bx2)
-    iy2 = min(ay2, by2)
-
-    if ix2 <= ix1 or iy2 <= iy1:
-        return 0.0
-
-    inter = (ix2 - ix1) * (iy2 - iy1)
-    area_a = (ax2 - ax1) * (ay2 - ay1)
-    area_b = (bx2 - bx1) * (by2 - by1)
-    union = area_a + area_b - inter
-    return inter / union if union > 0 else 0.0
-
-
 def match_detections(
     detections: list[Detection],
     gt_items: list[GroundTruthItem],
@@ -117,7 +97,7 @@ def match_detections(
                 continue
 
             text_match = _text_overlap(det.matched_text, gt.text)
-            iou = _bbox_iou(det.bbox, gt.bbox_approx)
+            iou = bbox_iou(det.bbox, gt.bbox_approx)
 
             if text_match or iou > 0.1:
                 score = iou + (1.0 if text_match else 0.0)
@@ -140,20 +120,6 @@ def match_detections(
 # Visualization
 # ---------------------------------------------------------------------------
 
-def _get_font(size: int = 13):
-    for path in [
-        "/System/Library/Fonts/SFNSMono.ttf",
-        "/System/Library/Fonts/Menlo.ttc",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-    ]:
-        if os.path.isfile(path):
-            try:
-                return ImageFont.truetype(path, size)
-            except Exception:
-                continue
-    return ImageFont.load_default()
-
-
 def draw_preview(
     image: Image.Image,
     matched: list[MatchedDetection],
@@ -163,7 +129,7 @@ def draw_preview(
     """Draw color-coded bounding boxes on the image and save."""
     preview = image.copy().convert("RGB")
     draw = ImageDraw.Draw(preview)
-    font = _get_font(12)
+    font = get_font(12)
 
     # TP = green, FP = yellow, FN = red
     for m in matched:
@@ -217,7 +183,10 @@ def run_benchmark(image_dir: str, config_path: str | None = None):
         image = Image.open(img_path)
 
         # Run OCR
-        ocr_results = run_ocr(image, config.ocr.languages, config.ocr.min_confidence, config.ocr.engine)
+        ocr_results = run_ocr(
+            image, config.ocr.languages, config.ocr.min_confidence,
+            config.ocr.engine, multi_preprocess=config.ocr.multi_preprocess,
+        )
         ocr_text = " ".join(r.text for r in ocr_results)
 
         # Run detection

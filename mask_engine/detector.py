@@ -14,25 +14,67 @@ class Detection:
     bbox: tuple[int, int, int, int]  # (left, top, width, height)
 
 
-def _group_into_lines(ocr_results: list[OcrResult], y_threshold: int = 10) -> list[list[OcrResult]]:
-    """Group word-level OCR results into lines based on Y coordinate proximity."""
+def _y_overlap(a: OcrResult, b: OcrResult) -> float:
+    """Compute vertical overlap ratio between two OCR results.
+
+    Returns intersection_height / min_height.  A value > 0 means the
+    two results share vertical space and likely sit on the same line.
+    """
+    a_top, a_bot = a.bbox[1], a.bbox[1] + a.bbox[3]
+    b_top, b_bot = b.bbox[1], b.bbox[1] + b.bbox[3]
+    inter = max(0, min(a_bot, b_bot) - max(a_top, b_top))
+    min_h = max(min(a.bbox[3], b.bbox[3]), 1)
+    return inter / min_h
+
+
+def _y_center(r: OcrResult) -> int:
+    """Return the vertical center of an OCR result."""
+    return r.bbox[1] + r.bbox[3] // 2
+
+
+def _group_into_lines(
+    ocr_results: list[OcrResult],
+    y_threshold: int | None = None,
+    overlap_ratio: float = 0.3,
+) -> list[list[OcrResult]]:
+    """Group OCR results into lines using vertical overlap.
+
+    Two results are on the same line if either:
+    - Their Y-center distance <= y_threshold, OR
+    - Their vertical overlap ratio >= overlap_ratio
+
+    Args:
+        y_threshold: Max Y-center distance to consider same line.
+                     If None, uses adaptive threshold = half median text height.
+        overlap_ratio: Min vertical overlap ratio to consider same line.
+    """
     if not ocr_results:
         return []
 
-    sorted_results = sorted(ocr_results, key=lambda r: (r.bbox[1], r.bbox[0]))
+    if y_threshold is None:
+        heights = sorted(r.bbox[3] for r in ocr_results)
+        median_h = heights[len(heights) // 2]
+        y_threshold = max(median_h // 2, 10)
+
+    sorted_results = sorted(ocr_results, key=lambda r: (_y_center(r), r.bbox[0]))
     lines: list[list[OcrResult]] = []
     current_line: list[OcrResult] = [sorted_results[0]]
-    current_y = sorted_results[0].bbox[1]
+    # Use the first (anchor) item's span as the fixed reference for the line
+    anchor = sorted_results[0]
+    anchor_yc = _y_center(anchor)
 
     for result in sorted_results[1:]:
-        y = result.bbox[1]
-        if abs(y - current_y) <= y_threshold:
+        yc_dist = abs(_y_center(result) - anchor_yc)
+        overlap = _y_overlap(result, anchor)
+
+        if yc_dist <= y_threshold or overlap >= overlap_ratio:
             current_line.append(result)
         else:
             current_line.sort(key=lambda r: r.bbox[0])
             lines.append(current_line)
             current_line = [result]
-            current_y = y
+            anchor = result
+            anchor_yc = _y_center(anchor)
 
     current_line.sort(key=lambda r: r.bbox[0])
     lines.append(current_line)
@@ -128,7 +170,7 @@ def _merge_overlapping_bboxes(detections: list[Detection], margin: int = 5) -> l
 def detect_sensitive(
     ocr_results: list[OcrResult],
     rules: list[DetectionRule],
-    y_threshold: int = 10,
+    y_threshold: int | None = None,
 ) -> list[Detection]:
     """Detect sensitive information by matching regex patterns against reconstructed text lines."""
     active_rules = [r for r in rules if r.enabled]
@@ -149,5 +191,24 @@ def detect_sensitive(
                     matched_text=match.group(),
                     bbox=bbox,
                 ))
+
+        # Dot-normalization second pass: replace dots between digits with spaces
+        # to catch OCR noise like "54019180.1888" → "54019180 1888"
+        normalized = re.sub(r'(?<=\d)\.(?=\d)', ' ', line_text)
+        if normalized != line_text:
+            for rule in active_rules:
+                for match in re.finditer(rule.pattern, normalized, re.IGNORECASE):
+                    # Check this match wasn't already found in the original text
+                    bbox = _find_covering_bboxes(match.start(), match.end(), mapping)
+                    already_found = any(
+                        d.bbox == bbox and d.label == rule.name
+                        for d in detections
+                    )
+                    if not already_found:
+                        detections.append(Detection(
+                            label=rule.name,
+                            matched_text=match.group(),
+                            bbox=bbox,
+                        ))
 
     return _merge_overlapping_bboxes(detections)
