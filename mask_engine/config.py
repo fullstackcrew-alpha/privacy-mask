@@ -6,7 +6,9 @@ from dataclasses import dataclass, field
 from typing import Any
 
 
-DEFAULT_CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config.json")
+_PROJECT_CONFIG = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config.json")
+_BUNDLED_CONFIG = os.path.join(os.path.dirname(__file__), "data", "config.json")
+DEFAULT_CONFIG_PATH = _PROJECT_CONFIG if os.path.isfile(_PROJECT_CONFIG) else _BUNDLED_CONFIG
 
 
 @dataclass

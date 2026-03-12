@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "privacy-mask"
+version = "0.1.0"
+description = "Local image privacy masking — detect and redact sensitive info (IDs, phones, keys, etc.) before images leave your machine."
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "wuhao"},
+]
+keywords = ["privacy", "masking", "ocr", "sensitive-data", "claude-code"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Security",
+    "Topic :: Multimedia :: Graphics",
+]
+dependencies = [
+    "Pillow>=10.0.0",
+    "pytesseract>=0.3.10",
+    "rapidocr-onnxruntime>=1.2.0",
+]
+
+[project.scripts]
+privacy-mask = "mask_engine.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/wuhao/privacy-mask"
+
+[tool.setuptools.packages.find]
+include = ["mask_engine*"]
+
+[tool.setuptools.package-data]
+mask_engine = ["data/*.json", "data/*.sh"]
