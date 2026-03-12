@@ -13,37 +13,11 @@ import json
 import os
 import sys
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-def _get_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
-    """Try to load a reasonable font; fall back to default."""
-    candidates = [
-        # macOS
-        "/System/Library/Fonts/SFNSMono.ttf",
-        "/System/Library/Fonts/Menlo.ttc",
-        "/System/Library/Fonts/Helvetica.ttc",
-        "/Library/Fonts/Arial.ttf",
-        # Linux
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-        "/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf",
-    ]
-    if bold:
-        candidates = [
-            "/System/Library/Fonts/Helvetica.ttc",
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-        ] + candidates
-
-    for path in candidates:
-        if os.path.isfile(path):
-            try:
-                return ImageFont.truetype(path, size)
-            except Exception:
-                continue
-    return ImageFont.load_default()
+from mask_engine.fonts import get_font
 
 
 def _text_bbox(draw: ImageDraw.ImageDraw, text: str, font) -> tuple[int, int]:
@@ -64,7 +38,7 @@ def scene_a_chat(font_size: int = 18) -> tuple[Image.Image, list[dict]]:
     w, h = 600, 400
     img = Image.new("RGB", (w, h), (245, 245, 245))
     draw = ImageDraw.Draw(img)
-    font = _get_font(font_size)
+    font = get_font(font_size)
     gt = []
 
     # Chat bubbles
@@ -101,7 +75,7 @@ def scene_b_terminal(font_size: int = 16) -> tuple[Image.Image, list[dict]]:
     w, h = 700, 350
     img = Image.new("RGB", (w, h), (40, 44, 52))  # dark background
     draw = ImageDraw.Draw(img)
-    font = _get_font(font_size)
+    font = get_font(font_size)
     gt = []
 
     lines_data = [
@@ -135,10 +109,10 @@ def scene_c_config(font_size: int = 16) -> tuple[Image.Image, list[dict]]:
     w, h = 650, 350
     img = Image.new("RGB", (w, h), (255, 255, 255))
     draw = ImageDraw.Draw(img)
-    font = _get_font(font_size)
+    font = get_font(font_size)
     gt = []
 
-    draw.text((20, 15), "Server Configuration", fill=(0, 0, 0), font=_get_font(22, bold=True))
+    draw.text((20, 15), "Server Configuration", fill=(0, 0, 0), font=get_font(22, bold=True))
 
     config_lines = [
         ("host: 192.168.1.100", "IP_ADDRESS", "192.168.1.100"),
@@ -173,7 +147,7 @@ def scene_d_dark_ui(font_size: int = 18) -> tuple[Image.Image, list[dict]]:
     # Gradient-ish dark blue background
     img = Image.new("RGB", (w, h), (25, 35, 70))
     draw = ImageDraw.Draw(img)
-    font = _get_font(font_size)
+    font = get_font(font_size)
     gt = []
 
     items = [
@@ -203,7 +177,7 @@ def scene_e_small_dense(font_size: int = 12) -> tuple[Image.Image, list[dict]]:
     w, h = 700, 400
     img = Image.new("RGB", (w, h), (250, 250, 250))
     draw = ImageDraw.Draw(img)
-    font = _get_font(font_size)
+    font = get_font(font_size)
     gt = []
 
     dense_lines = [
@@ -257,7 +231,7 @@ def scene_f_clean(font_size: int = 16) -> tuple[Image.Image, list[dict]]:
     w, h = 500, 300
     img = Image.new("RGB", (w, h), (255, 255, 255))
     draw = ImageDraw.Draw(img)
-    font = _get_font(font_size)
+    font = get_font(font_size)
 
     lines = [
         "Welcome to the Dashboard",
@@ -281,10 +255,10 @@ def scene_g_id_birthday(font_size: int = 16) -> tuple[Image.Image, list[dict]]:
     w, h = 600, 350
     img = Image.new("RGB", (w, h), (240, 248, 255))
     draw = ImageDraw.Draw(img)
-    font = _get_font(font_size)
+    font = get_font(font_size)
     gt = []
 
-    draw.text((20, 15), "User Profile", fill=(0, 0, 0), font=_get_font(20, bold=True))
+    draw.text((20, 15), "User Profile", fill=(0, 0, 0), font=get_font(20, bold=True))
 
     form_lines = [
         ("Name: Zhang San", None, None),
@@ -317,12 +291,12 @@ def scene_h_mixed_bg(font_size: int = 17) -> tuple[Image.Image, list[dict]]:
     w, h = 700, 400
     img = Image.new("RGB", (w, h), (200, 200, 200))
     draw = ImageDraw.Draw(img)
-    font = _get_font(font_size)
+    font = get_font(font_size)
     gt = []
 
     # Panel 1 - green header
     draw.rectangle([10, 10, 340, 190], fill=(220, 245, 220))
-    draw.text((20, 20), "Network Info", fill=(0, 80, 0), font=_get_font(18, bold=True))
+    draw.text((20, 20), "Network Info", fill=(0, 80, 0), font=get_font(18, bold=True))
     panel1_lines = [
         ("Router: 192.168.1.1", "IP_ADDRESS", "192.168.1.1"),
         ("DNS: 114.114.114.114", "IP_ADDRESS", "114.114.114.114"),
@@ -343,7 +317,7 @@ def scene_h_mixed_bg(font_size: int = 17) -> tuple[Image.Image, list[dict]]:
 
     # Panel 2 - orange header
     draw.rectangle([360, 10, 690, 190], fill=(255, 240, 220))
-    draw.text((370, 20), "Credentials", fill=(160, 80, 0), font=_get_font(18, bold=True))
+    draw.text((370, 20), "Credentials", fill=(160, 80, 0), font=get_font(18, bold=True))
     draw.text((370, 55), "password = MyP@ss_w0rd_12345678", fill=(100, 50, 0), font=font)
     tw, th = _text_bbox(draw, "password = ", font)
     sw, sh = _text_bbox(draw, "MyP@ss_w0rd_12345678", font)
