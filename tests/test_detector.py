@@ -17,6 +17,45 @@ def _make_rules():
         DetectionRule(name="BIRTHDAY_EN", pattern=r"\d{1,2}\s*(?:JAN|FEB|FEV|MAR|APR|AVR|MAY|MAI|JUN|JUIN|JUL|JUIL|AUG|AOUT|SEP|SEPT|OCT|NOV|DEC)(?:/[A-Z]{2,5})?\s*\d{2,4}", description="EN/FR date", enabled=True),
         DetectionRule(name="MRZ_LINE1", pattern=r"P[<«.O0][A-Z]{3}[A-Z<«.]{5,}", description="MRZ line 1", enabled=True),
         DetectionRule(name="MRZ_LINE2", pattern=r"[A-Z0-9][A-Z0-9<«]{29,}", description="MRZ line 2", enabled=True),
+        DetectionRule(name="LICENSE_PLATE_CN", pattern=r"[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤川青藏琼宁][A-HJ-NP-Z][A-HJ-NP-Z0-9]{4,5}[A-HJ-NP-Z0-9挂学警港澳]?", description="License plate", enabled=True),
+        DetectionRule(name="UNIFIED_CREDIT_CODE", pattern=r"[0-9]{2}[0-9]{6}[0-9A-HJ-NP-RTUW-Y]{10}", description="Credit code", enabled=True),
+        DetectionRule(name="PHONE_CN_LANDLINE", pattern=r"0[1-9]\d{1,2}[\s-]\d{7,8}", description="Landline", enabled=True),
+        DetectionRule(name="BIRTHDAY_CN", pattern=r"(?:19|20)\d{2}年(?:0?[1-9]|1[0-2])月(?:0?[1-9]|[12]\d|3[01])日", description="CN date", enabled=True),
+        DetectionRule(name="URL_AUTH_TOKEN", pattern=r"https?://[^\s]*[?&](?:token|access_token|auth|session|jwt|key|secret|code|password)=[^\s&]{8,}", description="URL token", enabled=True),
+        DetectionRule(name="QQ_NUMBER", pattern=r"(?:QQ|qq)[:\s：]*\d{5,12}", description="QQ", enabled=True),
+        DetectionRule(name="WECHAT_ID", pattern=r"(?:微信|WeChat|wechat)[:\s：]*[a-zA-Z][a-zA-Z0-9_-]{5,19}", description="WeChat", enabled=True),
+        DetectionRule(name="HKID", pattern=r"[A-Z]{1,2}\d{6}\(\d\)", description="HKID", enabled=True),
+        DetectionRule(name="TWID", pattern=r"(?<![A-Za-z])[A-Z][12]\d{8}(?![A-Za-z0-9])", description="TWID", enabled=True),
+        DetectionRule(name="IBAN", pattern=r"[A-Z]{2}\d{2}[\s]?[\dA-Z]{4}(?:[\s]?[\dA-Z]{4}){1,7}(?:[\s]?[\dA-Z]{1,4})?", description="IBAN", enabled=True),
+        DetectionRule(name="PEM_PRIVATE_KEY", pattern=r"-----BEGIN[\s\w]*(?:PRIVATE KEY|CERTIFICATE)-----", description="PEM key", enabled=True),
+        DetectionRule(name="SSH_KEY", pattern=r"ssh-(?:rsa|ed25519|dsa|ecdsa)\s+[A-Za-z0-9+/=]{20,}", description="SSH key", enabled=True),
+        DetectionRule(name="MAC_ADDRESS", pattern=r"(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}", description="MAC", enabled=True),
+        DetectionRule(name="UUID", pattern=r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", description="UUID", enabled=True),
+        DetectionRule(name="IPV6", pattern=r"(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}", description="IPv6", enabled=True),
+        # P0 — Global high-value rules
+        DetectionRule(name="US_SSN", pattern=r"(?<!\d)\d{3}-\d{2}-\d{4}(?!\d)", description="US SSN", enabled=True),
+        DetectionRule(name="CREDIT_CARD_AMEX", pattern=r"(?<!\d)3[47]\d{2}[\s-]?\d{6}[\s-]?\d{5}(?!\d)", description="Amex", enabled=True),
+        DetectionRule(name="PHONE_INTL", pattern=r"\+\d{1,3}[\s.-]?\(?\d{1,4}\)?[\s.-]?\d{2,4}[\s.-]?\d{2,4}[\s.-]?\d{0,4}", description="Intl phone", enabled=True),
+        DetectionRule(name="AWS_ACCESS_KEY", pattern=r"(?<![A-Za-z0-9])(?:AKIA|ASIA)[0-9A-Z]{16}(?![A-Za-z0-9])", description="AWS key", enabled=True),
+        DetectionRule(name="GITHUB_TOKEN", pattern=r"(?<![A-Za-z0-9])(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36}(?![A-Za-z0-9])", description="GitHub token", enabled=True),
+        DetectionRule(name="SLACK_TOKEN", pattern=r"(?<![A-Za-z0-9])xox[bpsa]-[A-Za-z0-9-]{10,}(?![A-Za-z0-9])", description="Slack token", enabled=True),
+        DetectionRule(name="GOOGLE_API_KEY", pattern=r"(?<![A-Za-z0-9])AIza[A-Za-z0-9_-]{35}(?![A-Za-z0-9])", description="Google API key", enabled=True),
+        DetectionRule(name="STRIPE_KEY", pattern=r"(?<![A-Za-z0-9])(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{10,}(?![A-Za-z0-9])", description="Stripe key", enabled=True),
+        # P1 — Country IDs + finance + developer
+        DetectionRule(name="UK_NINO", pattern=r"(?<![A-Za-z])[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z]\d{6}[A-D](?![A-Za-z0-9])", description="UK NINO", enabled=True),
+        DetectionRule(name="CANADIAN_SIN", pattern=r"(?<!\d)\d{3}-\d{3}-\d{3}(?!\d)", description="Canadian SIN", enabled=True),
+        DetectionRule(name="INDIAN_AADHAAR", pattern=r"(?<!\d)[2-9]\d{3}\s\d{4}\s\d{4}(?!\d)", description="Aadhaar", enabled=True),
+        DetectionRule(name="INDIAN_PAN", pattern=r"(?<![A-Za-z0-9])[A-Z]{5}\d{4}[A-Z](?![A-Za-z0-9])", description="Indian PAN", enabled=True),
+        DetectionRule(name="KOREAN_RRN", pattern=r"(?<!\d)\d{6}-[1-4]\d{6}(?!\d)", description="Korean RRN", enabled=True),
+        DetectionRule(name="SINGAPORE_NRIC", pattern=r"(?<![A-Za-z0-9])[STFGM]\d{7}[A-Z](?![A-Za-z0-9])", description="SG NRIC", enabled=True),
+        DetectionRule(name="SWIFT_BIC", pattern=r"(?<![A-Za-z0-9])[A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?(?![A-Za-z0-9])", description="SWIFT/BIC", enabled=True),
+        DetectionRule(name="CRYPTO_WALLET_ETH", pattern=r"(?<![A-Za-z0-9])0x[0-9a-fA-F]{40}(?![A-Za-z0-9])", description="ETH wallet", enabled=True),
+        DetectionRule(name="PHONE_US", pattern=r"(?<!\d)\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}(?!\d)", description="US phone", enabled=True),
+        DetectionRule(name="JWT_TOKEN", pattern=r"eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}", description="JWT", enabled=True),
+        DetectionRule(name="CONNECTION_STRING", pattern=r"(?:mongodb(?:\+srv)?|mysql|postgres(?:ql)?|redis|amqp|mssql)://[^\s]{10,}", description="DB conn string", enabled=True),
+        # P2 — Supplementary
+        DetectionRule(name="MALAYSIAN_IC", pattern=r"(?<!\d)\d{6}-\d{2}-\d{4}(?!\d)", description="Malaysian IC", enabled=True),
+        DetectionRule(name="CRYPTO_WALLET_BTC", pattern=r"(?<![A-Za-z0-9])(?:bc1[a-z0-9]{25,39}|[13][a-km-zA-HJ-NP-Z1-9]{25,39})(?![A-Za-z0-9])", description="BTC wallet", enabled=True),
     ]
 
 
@@ -251,7 +290,7 @@ class TestPassportDetection:
         """MRZ line 2 (44-char alphanumeric + filler sequence)."""
         ocr = [_make_ocr("G222123019CHN5612190M220221119200101<<<<<<44", 10, 10, w=500)]
         dets = detect_sensitive(ocr, _make_rules())
-        assert any(d.label == "MRZ_LINE2" for d in dets)
+        assert any("MRZ_LINE2" in d.label for d in dets)
 
     def test_mrz_line2_short_text_no_match(self):
         """Short alphanumeric text should not match MRZ_LINE2."""
@@ -274,3 +313,815 @@ class TestPassportDetection:
         assert "BIRTHDAY_EN" in all_labels
         assert "MRZ_LINE1" in all_labels
         assert "MRZ_LINE2" in all_labels
+
+
+class TestLicensePlateCN:
+    def test_standard_plate(self):
+        ocr = [_make_ocr("京A12345", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "LICENSE_PLATE_CN" for d in dets)
+
+    def test_new_energy_plate(self):
+        """New energy vehicle plate with 6 alphanumeric chars."""
+        ocr = [_make_ocr("粤BD12345", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "LICENSE_PLATE_CN" for d in dets)
+
+    def test_special_suffix(self):
+        """Plate with 挂/学/警 suffix."""
+        ocr = [_make_ocr("沪A1234警", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "LICENSE_PLATE_CN" for d in dets)
+
+    def test_no_match_plain_text(self):
+        ocr = [_make_ocr("Hello World", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "LICENSE_PLATE_CN" for d in dets)
+
+    def test_various_provinces(self):
+        for province in ["川", "鲁", "闽", "藏"]:
+            ocr = [_make_ocr(f"{province}A12345", 10, 10, w=100)]
+            dets = detect_sensitive(ocr, _make_rules())
+            assert any(d.label == "LICENSE_PLATE_CN" for d in dets), f"Failed for {province}"
+
+
+class TestUnifiedCreditCode:
+    def test_valid_code(self):
+        ocr = [_make_ocr("91110108MA01ABCDEF", 10, 10, w=200)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "UNIFIED_CREDIT_CODE" for d in dets)
+
+    def test_all_numeric(self):
+        ocr = [_make_ocr("911101080123456789", 10, 10, w=200)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "UNIFIED_CREDIT_CODE" for d in dets)
+
+    def test_short_string_no_match(self):
+        ocr = [_make_ocr("91110108", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "UNIFIED_CREDIT_CODE" for d in dets)
+
+
+class TestPhoneCNLandline:
+    def test_beijing_landline(self):
+        ocr = [_make_ocr("010-12345678", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "PHONE_CN_LANDLINE" for d in dets)
+
+    def test_4digit_area_code(self):
+        ocr = [_make_ocr("0755-1234567", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "PHONE_CN_LANDLINE" for d in dets)
+
+    def test_space_separator(self):
+        ocr = [_make_ocr("021 12345678", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "PHONE_CN_LANDLINE" for d in dets)
+
+    def test_no_separator_no_match(self):
+        """Without separator, should not match to avoid false positives."""
+        ocr = [_make_ocr("01012345678", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "PHONE_CN_LANDLINE" for d in dets)
+
+
+class TestBirthdayCN:
+    def test_standard_date(self):
+        ocr = [_make_ocr("1990年1月15日", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "BIRTHDAY_CN" for d in dets)
+
+    def test_zero_padded(self):
+        ocr = [_make_ocr("2000年01月05日", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "BIRTHDAY_CN" for d in dets)
+
+    def test_invalid_month_no_match(self):
+        ocr = [_make_ocr("1990年13月15日", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "BIRTHDAY_CN" for d in dets)
+
+    def test_invalid_day_no_match(self):
+        ocr = [_make_ocr("1990年12月32日", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "BIRTHDAY_CN" for d in dets)
+
+
+class TestURLAuthToken:
+    def test_token_param(self):
+        ocr = [_make_ocr("https://api.example.com/data?token=abc123def456ghi7", 10, 10, w=400)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("URL_AUTH_TOKEN" in d.label for d in dets)
+
+    def test_access_token(self):
+        ocr = [_make_ocr("https://example.com/cb?access_token=eyJhbGciOiJIUzI1NiJ9", 10, 10, w=400)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "URL_AUTH_TOKEN" for d in dets)
+
+    def test_short_value_no_match(self):
+        """Token value < 8 chars should not match."""
+        ocr = [_make_ocr("https://example.com?token=abc", 10, 10, w=300)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "URL_AUTH_TOKEN" for d in dets)
+
+    def test_no_token_param_no_match(self):
+        ocr = [_make_ocr("https://example.com?page=123456789", 10, 10, w=300)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "URL_AUTH_TOKEN" for d in dets)
+
+
+class TestQQNumber:
+    def test_qq_with_colon(self):
+        ocr = [_make_ocr("QQ:12345678", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "QQ_NUMBER" for d in dets)
+
+    def test_qq_lowercase(self):
+        ocr = [_make_ocr("qq 987654321", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "QQ_NUMBER" for d in dets)
+
+    def test_qq_chinese_colon(self):
+        ocr = [_make_ocr("QQ：12345", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "QQ_NUMBER" for d in dets)
+
+    def test_short_number_no_match(self):
+        """QQ number < 5 digits should not match."""
+        ocr = [_make_ocr("QQ:1234", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "QQ_NUMBER" for d in dets)
+
+
+class TestWeChatID:
+    def test_wechat_cn(self):
+        ocr = [_make_ocr("微信:abc123def", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "WECHAT_ID" for d in dets)
+
+    def test_wechat_en(self):
+        ocr = [_make_ocr("WeChat: myWechat_01", 10, 10, w=150)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("WECHAT_ID" in d.label for d in dets)
+
+    def test_digit_start_no_match(self):
+        """WeChat ID must start with a letter."""
+        ocr = [_make_ocr("微信:123456", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "WECHAT_ID" for d in dets)
+
+    def test_too_short_no_match(self):
+        """WeChat ID < 6 chars should not match."""
+        ocr = [_make_ocr("微信:ab12", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "WECHAT_ID" for d in dets)
+
+
+class TestHKID:
+    def test_single_letter(self):
+        ocr = [_make_ocr("A123456(7)", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "HKID" for d in dets)
+
+    def test_double_letter(self):
+        ocr = [_make_ocr("AB123456(0)", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "HKID" for d in dets)
+
+    def test_no_check_digit_no_match(self):
+        ocr = [_make_ocr("A1234567", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "HKID" for d in dets)
+
+
+class TestTWID:
+    def test_valid_twid(self):
+        ocr = [_make_ocr("A123456789", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "TWID" for d in dets)
+
+    def test_gender_2(self):
+        ocr = [_make_ocr("B234567890", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "TWID" for d in dets)
+
+    def test_embedded_no_match(self):
+        """Should not match when embedded in longer alphanumeric string."""
+        ocr = [_make_ocr("XA123456789Y", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "TWID" for d in dets)
+
+
+class TestIBAN:
+    def test_german_iban(self):
+        ocr = [_make_ocr("DE89 3704 0044 0532 0130 00", 10, 10, w=250)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("IBAN" in d.label for d in dets)
+
+    def test_uk_iban_no_spaces(self):
+        ocr = [_make_ocr("GB29NWBK60161331926819", 10, 10, w=200)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("IBAN" in d.label for d in dets)
+
+    def test_short_no_match(self):
+        ocr = [_make_ocr("AB12", 10, 10, w=40)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "IBAN" for d in dets)
+
+
+class TestPEMPrivateKey:
+    def test_rsa_private_key(self):
+        ocr = [_make_ocr("-----BEGIN RSA PRIVATE KEY-----", 10, 10, w=300)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "PEM_PRIVATE_KEY" for d in dets)
+
+    def test_certificate(self):
+        ocr = [_make_ocr("-----BEGIN CERTIFICATE-----", 10, 10, w=250)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("PEM_PRIVATE_KEY" in d.label for d in dets)
+
+    def test_generic_private_key(self):
+        ocr = [_make_ocr("-----BEGIN PRIVATE KEY-----", 10, 10, w=250)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "PEM_PRIVATE_KEY" for d in dets)
+
+
+class TestSSHKey:
+    def test_ssh_rsa(self):
+        ocr = [_make_ocr("ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQ", 10, 10, w=300)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "SSH_KEY" for d in dets)
+
+    def test_ssh_ed25519(self):
+        ocr = [_make_ocr("ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA", 10, 10, w=300)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "SSH_KEY" for d in dets)
+
+    def test_short_key_no_match(self):
+        ocr = [_make_ocr("ssh-rsa AAAA", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "SSH_KEY" for d in dets)
+
+
+class TestMACAddress:
+    def test_colon_format(self):
+        ocr = [_make_ocr("00:1A:2B:3C:4D:5E", 10, 10, w=150)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "MAC_ADDRESS" for d in dets)
+
+    def test_dash_format(self):
+        ocr = [_make_ocr("00-1A-2B-3C-4D-5E", 10, 10, w=150)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "MAC_ADDRESS" for d in dets)
+
+    def test_lowercase(self):
+        ocr = [_make_ocr("aa:bb:cc:dd:ee:ff", 10, 10, w=150)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "MAC_ADDRESS" for d in dets)
+
+    def test_too_short_no_match(self):
+        ocr = [_make_ocr("00:1A:2B", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "MAC_ADDRESS" for d in dets)
+
+
+class TestUUID:
+    def test_valid_uuid(self):
+        ocr = [_make_ocr("550e8400-e29b-41d4-a716-446655440000", 10, 10, w=300)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "UUID" for d in dets)
+
+    def test_uppercase_uuid(self):
+        ocr = [_make_ocr("550E8400-E29B-41D4-A716-446655440000", 10, 10, w=300)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "UUID" for d in dets)
+
+    def test_missing_section_no_match(self):
+        ocr = [_make_ocr("550e8400-e29b-41d4-a716", 10, 10, w=200)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "UUID" for d in dets)
+
+
+class TestIPv6:
+    def test_full_ipv6(self):
+        ocr = [_make_ocr("2001:0db8:85a3:0000:0000:8a2e:0370:7334", 10, 10, w=350)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "IPV6" for d in dets)
+
+    def test_short_segments(self):
+        ocr = [_make_ocr("fe80:0:0:0:0:0:0:1", 10, 10, w=200)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "IPV6" for d in dets)
+
+    def test_too_few_groups_no_match(self):
+        ocr = [_make_ocr("2001:0db8:85a3", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "IPV6" for d in dets)
+
+
+# ===== P0: High-value, low false-positive rules =====
+
+class TestUSSSN:
+    def test_valid_ssn(self):
+        ocr = [_make_ocr("123-45-6789", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("US_SSN" in d.label for d in dets)
+
+    def test_another_ssn(self):
+        ocr = [_make_ocr("987-65-4321", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("US_SSN" in d.label for d in dets)
+
+    def test_no_dashes_no_match(self):
+        """Without dashes, should not match."""
+        ocr = [_make_ocr("123456789", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "US_SSN" for d in dets)
+
+    def test_wrong_grouping_no_match(self):
+        """3-3-3 grouping should not match SSN (that's Canadian SIN)."""
+        ocr = [_make_ocr("123-456-789", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "US_SSN" for d in dets)
+
+    def test_embedded_digits_no_match(self):
+        """SSN embedded in longer digit string should not match."""
+        ocr = [_make_ocr("9123-45-67890", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "US_SSN" for d in dets)
+
+
+class TestCreditCardAmex:
+    def test_amex_34(self):
+        ocr = [_make_ocr("3412 345678 90123", 10, 10, w=160)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CREDIT_CARD_AMEX" in d.label for d in dets)
+
+    def test_amex_37(self):
+        ocr = [_make_ocr("3712-345678-90123", 10, 10, w=160)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CREDIT_CARD_AMEX" in d.label for d in dets)
+
+    def test_amex_no_separator(self):
+        ocr = [_make_ocr("341234567890123", 10, 10, w=140)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CREDIT_CARD_AMEX" in d.label for d in dets)
+
+    def test_wrong_prefix_no_match(self):
+        """Card starting with 35 should not match Amex."""
+        ocr = [_make_ocr("351234567890123", 10, 10, w=140)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "CREDIT_CARD_AMEX" for d in dets)
+
+
+class TestPhoneIntl:
+    def test_us_intl(self):
+        ocr = [_make_ocr("+1 202-555-0123", 10, 10, w=140)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("PHONE_INTL" in d.label for d in dets)
+
+    def test_uk_intl(self):
+        ocr = [_make_ocr("+44 20 7946 0958", 10, 10, w=150)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("PHONE_INTL" in d.label for d in dets)
+
+    def test_cn_intl(self):
+        ocr = [_make_ocr("+86 138 1234 5678", 10, 10, w=160)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("PHONE_INTL" in d.label for d in dets)
+
+    def test_no_plus_no_match(self):
+        """Without + prefix, should not match PHONE_INTL."""
+        ocr = [_make_ocr("44 20 7946 0958", 10, 10, w=140)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "PHONE_INTL" for d in dets)
+
+
+class TestAWSAccessKey:
+    def test_akia_key(self):
+        ocr = [_make_ocr("AKIAIOSFODNN7EXAMPLE", 10, 10, w=200)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("AWS_ACCESS_KEY" in d.label for d in dets)
+
+    def test_asia_key(self):
+        ocr = [_make_ocr("ASIAJEXAMPLEKEY12345", 10, 10, w=200)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("AWS_ACCESS_KEY" in d.label for d in dets)
+
+    def test_wrong_prefix_no_match(self):
+        ocr = [_make_ocr("AKIBIOSFODNN7EXAMPLE", 10, 10, w=200)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "AWS_ACCESS_KEY" for d in dets)
+
+    def test_embedded_no_match(self):
+        ocr = [_make_ocr("xAKIAIOSFODNN7EXAMPLE", 10, 10, w=200)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "AWS_ACCESS_KEY" for d in dets)
+
+
+class TestGitHubToken:
+    def test_ghp_token(self):
+        ocr = [_make_ocr("ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij", 10, 10, w=350)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("GITHUB_TOKEN" in d.label for d in dets)
+
+    def test_gho_token(self):
+        ocr = [_make_ocr("gho_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij", 10, 10, w=350)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("GITHUB_TOKEN" in d.label for d in dets)
+
+    def test_short_token_no_match(self):
+        """Token with < 36 chars after prefix should not match."""
+        ocr = [_make_ocr("ghp_ABCDEF", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "GITHUB_TOKEN" for d in dets)
+
+    def test_embedded_no_match(self):
+        ocr = [_make_ocr("xghp_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij", 10, 10, w=350)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "GITHUB_TOKEN" for d in dets)
+
+
+class TestSlackToken:
+    def test_xoxb_token(self):
+        ocr = [_make_ocr("xoxb-1234567890-abcdefghij", 10, 10, w=250)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("SLACK_TOKEN" in d.label for d in dets)
+
+    def test_xoxp_token(self):
+        ocr = [_make_ocr("xoxp-9876543210-abcdefghij", 10, 10, w=250)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("SLACK_TOKEN" in d.label for d in dets)
+
+    def test_short_token_no_match(self):
+        ocr = [_make_ocr("xoxb-abc", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "SLACK_TOKEN" for d in dets)
+
+
+class TestGoogleAPIKey:
+    def test_valid_key(self):
+        ocr = [_make_ocr("AIzaSyA1234567890abcdefghijklmnopqrstuv", 10, 10, w=350)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("GOOGLE_API_KEY" in d.label for d in dets)
+
+    def test_wrong_prefix_no_match(self):
+        ocr = [_make_ocr("AIzbSyA1234567890abcdefghijklmnopqrstuv", 10, 10, w=350)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "GOOGLE_API_KEY" for d in dets)
+
+    def test_short_key_no_match(self):
+        ocr = [_make_ocr("AIzaShort", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "GOOGLE_API_KEY" for d in dets)
+
+
+class TestStripeKey:
+    def test_sk_live(self):
+        ocr = [_make_ocr("sk__EXAMPLE_live_1234567890abcdefgh", 10, 10, w=250)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("STRIPE_KEY" in d.label for d in dets)
+
+    def test_pk_test(self):
+        ocr = [_make_ocr("pk_test_abcdefghijklmnop", 10, 10, w=220)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("STRIPE_KEY" in d.label for d in dets)
+
+    def test_rk_live(self):
+        ocr = [_make_ocr("rk_live_0987654321zyxwvu", 10, 10, w=250)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("STRIPE_KEY" in d.label for d in dets)
+
+    def test_wrong_mode_no_match(self):
+        """sk_prod_ is not a valid Stripe key prefix."""
+        ocr = [_make_ocr("sk_prod_1234567890abcdefgh", 10, 10, w=250)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "STRIPE_KEY" for d in dets)
+
+
+# ===== P1: Country IDs + finance + developer =====
+
+class TestUKNINO:
+    def test_valid_nino(self):
+        ocr = [_make_ocr("AB123456C", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("UK_NINO" in d.label for d in dets)
+
+    def test_another_valid(self):
+        ocr = [_make_ocr("CE987654A", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("UK_NINO" in d.label for d in dets)
+
+    def test_invalid_prefix_d(self):
+        """D is not valid as first letter of NINO."""
+        ocr = [_make_ocr("DA123456B", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "UK_NINO" for d in dets)
+
+    def test_invalid_suffix(self):
+        """Suffix must be A-D only."""
+        ocr = [_make_ocr("AB123456E", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "UK_NINO" for d in dets)
+
+
+class TestCanadianSIN:
+    def test_valid_sin(self):
+        ocr = [_make_ocr("123-456-789", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CANADIAN_SIN" in d.label for d in dets)
+
+    def test_another_valid(self):
+        ocr = [_make_ocr("987-654-321", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CANADIAN_SIN" in d.label for d in dets)
+
+    def test_no_dashes_no_match(self):
+        ocr = [_make_ocr("123456789", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "CANADIAN_SIN" for d in dets)
+
+    def test_wrong_grouping_no_match(self):
+        """3-2-4 is SSN, not SIN."""
+        ocr = [_make_ocr("123-45-6789", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "CANADIAN_SIN" for d in dets)
+
+
+class TestIndianAadhaar:
+    def test_valid_aadhaar(self):
+        ocr = [_make_ocr("2345 6789 0123", 10, 10, w=130)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("INDIAN_AADHAAR" in d.label for d in dets)
+
+    def test_first_digit_9(self):
+        ocr = [_make_ocr("9876 5432 1098", 10, 10, w=130)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("INDIAN_AADHAAR" in d.label for d in dets)
+
+    def test_first_digit_0_no_match(self):
+        """Aadhaar cannot start with 0."""
+        ocr = [_make_ocr("0123 4567 8901", 10, 10, w=130)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "INDIAN_AADHAAR" for d in dets)
+
+    def test_first_digit_1_no_match(self):
+        """Aadhaar cannot start with 1."""
+        ocr = [_make_ocr("1234 5678 9012", 10, 10, w=130)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "INDIAN_AADHAAR" for d in dets)
+
+    def test_no_spaces_no_match(self):
+        ocr = [_make_ocr("234567890123", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "INDIAN_AADHAAR" for d in dets)
+
+
+class TestIndianPAN:
+    def test_valid_pan(self):
+        ocr = [_make_ocr("ABCDE1234F", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("INDIAN_PAN" in d.label for d in dets)
+
+    def test_another_valid(self):
+        ocr = [_make_ocr("ZZZZZ9999Z", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("INDIAN_PAN" in d.label for d in dets)
+
+    def test_wrong_format_no_match(self):
+        """Too few letters at start should not match."""
+        ocr = [_make_ocr("ABCD12345F", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "INDIAN_PAN" for d in dets)
+
+    def test_embedded_no_match(self):
+        ocr = [_make_ocr("XABCDE1234FY", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "INDIAN_PAN" for d in dets)
+
+
+class TestKoreanRRN:
+    def test_valid_rrn_male(self):
+        ocr = [_make_ocr("900101-1234567", 10, 10, w=140)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("KOREAN_RRN" in d.label for d in dets)
+
+    def test_valid_rrn_female(self):
+        ocr = [_make_ocr("850315-2987654", 10, 10, w=140)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("KOREAN_RRN" in d.label for d in dets)
+
+    def test_gender_digit_3(self):
+        ocr = [_make_ocr("010101-3123456", 10, 10, w=140)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("KOREAN_RRN" in d.label for d in dets)
+
+    def test_gender_digit_5_no_match(self):
+        """Gender digit must be 1-4."""
+        ocr = [_make_ocr("900101-5234567", 10, 10, w=140)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "KOREAN_RRN" for d in dets)
+
+    def test_no_dash_no_match(self):
+        ocr = [_make_ocr("9001011234567", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "KOREAN_RRN" for d in dets)
+
+
+class TestSingaporeNRIC:
+    def test_valid_s_prefix(self):
+        ocr = [_make_ocr("S1234567D", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("SINGAPORE_NRIC" in d.label for d in dets)
+
+    def test_valid_t_prefix(self):
+        ocr = [_make_ocr("T0123456A", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("SINGAPORE_NRIC" in d.label for d in dets)
+
+    def test_valid_f_prefix(self):
+        ocr = [_make_ocr("F9876543Z", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("SINGAPORE_NRIC" in d.label for d in dets)
+
+    def test_invalid_prefix_no_match(self):
+        """X is not a valid NRIC prefix."""
+        ocr = [_make_ocr("X1234567D", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "SINGAPORE_NRIC" for d in dets)
+
+    def test_embedded_no_match(self):
+        ocr = [_make_ocr("AS1234567D", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "SINGAPORE_NRIC" for d in dets)
+
+
+class TestSWIFTBIC:
+    def test_8char_bic(self):
+        ocr = [_make_ocr("DEUTDEFF", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("SWIFT_BIC" in d.label for d in dets)
+
+    def test_11char_bic(self):
+        ocr = [_make_ocr("DEUTDEFF500", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("SWIFT_BIC" in d.label for d in dets)
+
+    def test_hsbc_bic(self):
+        ocr = [_make_ocr("HSBCHKHH", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("SWIFT_BIC" in d.label for d in dets)
+
+    def test_too_short_no_match(self):
+        ocr = [_make_ocr("DEUT", 10, 10, w=40)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "SWIFT_BIC" for d in dets)
+
+
+class TestCryptoWalletETH:
+    def test_valid_eth_address(self):
+        ocr = [_make_ocr("0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18", 10, 10, w=380)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CRYPTO_WALLET_ETH" in d.label for d in dets)
+
+    def test_lowercase_eth(self):
+        ocr = [_make_ocr("0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae", 10, 10, w=380)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CRYPTO_WALLET_ETH" in d.label for d in dets)
+
+    def test_short_hex_no_match(self):
+        """0x + less than 40 hex chars should not match."""
+        ocr = [_make_ocr("0x742d35Cc6634C053", 10, 10, w=160)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "CRYPTO_WALLET_ETH" for d in dets)
+
+    def test_embedded_no_match(self):
+        ocr = [_make_ocr("A0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18", 10, 10, w=400)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "CRYPTO_WALLET_ETH" for d in dets)
+
+
+class TestPhoneUS:
+    def test_parentheses_format(self):
+        ocr = [_make_ocr("(202) 555-0123", 10, 10, w=130)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("PHONE_US" in d.label for d in dets)
+
+    def test_dash_format(self):
+        ocr = [_make_ocr("202-555-0123", 10, 10, w=110)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("PHONE_US" in d.label for d in dets)
+
+    def test_dot_format(self):
+        ocr = [_make_ocr("202.555.0123", 10, 10, w=110)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("PHONE_US" in d.label for d in dets)
+
+    def test_no_separator_no_match(self):
+        """10 consecutive digits without separators should not match."""
+        ocr = [_make_ocr("2025550123", 10, 10, w=90)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "PHONE_US" for d in dets)
+
+
+class TestJWTToken:
+    def test_valid_jwt(self):
+        ocr = [_make_ocr("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U", 10, 10, w=500)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("JWT_TOKEN" in d.label for d in dets)
+
+    def test_short_segments_no_match(self):
+        """JWT segments too short should not match."""
+        ocr = [_make_ocr("eyJhbG.eyJzdW.abc", 10, 10, w=150)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "JWT_TOKEN" for d in dets)
+
+    def test_missing_segment_no_match(self):
+        """Only two segments should not match."""
+        ocr = [_make_ocr("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0", 10, 10, w=400)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "JWT_TOKEN" for d in dets)
+
+
+class TestConnectionString:
+    def test_postgres(self):
+        ocr = [_make_ocr("postgresql://user:pass@host:5432/dbname", 10, 10, w=350)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CONNECTION_STRING" in d.label for d in dets)
+
+    def test_mongodb(self):
+        ocr = [_make_ocr("mongodb://admin:secret@mongo.example.com:27017/mydb", 10, 10, w=400)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CONNECTION_STRING" in d.label for d in dets)
+
+    def test_mongodb_srv(self):
+        ocr = [_make_ocr("mongodb+srv://user:pass@cluster0.mongodb.net/mydb", 10, 10, w=400)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CONNECTION_STRING" in d.label for d in dets)
+
+    def test_redis(self):
+        ocr = [_make_ocr("redis://default:password@redis.example.com:6379", 10, 10, w=380)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CONNECTION_STRING" in d.label for d in dets)
+
+    def test_mysql(self):
+        ocr = [_make_ocr("mysql://root:password@localhost:3306/testdb", 10, 10, w=370)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CONNECTION_STRING" in d.label for d in dets)
+
+    def test_http_no_match(self):
+        """HTTP URLs should not match connection string."""
+        ocr = [_make_ocr("https://www.example.com/api/data", 10, 10, w=280)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "CONNECTION_STRING" for d in dets)
+
+
+# ===== P2: Supplementary =====
+
+class TestMalaysianIC:
+    def test_valid_ic(self):
+        ocr = [_make_ocr("901231-14-5678", 10, 10, w=130)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("MALAYSIAN_IC" in d.label for d in dets)
+
+    def test_another_valid(self):
+        ocr = [_make_ocr("850715-01-1234", 10, 10, w=130)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("MALAYSIAN_IC" in d.label for d in dets)
+
+    def test_no_dashes_no_match(self):
+        ocr = [_make_ocr("901231145678", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "MALAYSIAN_IC" for d in dets)
+
+    def test_embedded_digits_no_match(self):
+        ocr = [_make_ocr("1901231-14-56789", 10, 10, w=140)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "MALAYSIAN_IC" for d in dets)
+
+
+class TestCryptoWalletBTC:
+    def test_legacy_address_1(self):
+        ocr = [_make_ocr("1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2", 10, 10, w=300)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CRYPTO_WALLET_BTC" in d.label for d in dets)
+
+    def test_legacy_address_3(self):
+        ocr = [_make_ocr("3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy", 10, 10, w=300)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CRYPTO_WALLET_BTC" in d.label for d in dets)
+
+    def test_bech32_address(self):
+        ocr = [_make_ocr("bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq", 10, 10, w=380)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("CRYPTO_WALLET_BTC" in d.label for d in dets)
+
+    def test_too_short_no_match(self):
+        ocr = [_make_ocr("1BvBMSEY", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "CRYPTO_WALLET_BTC" for d in dets)
+
+    def test_embedded_no_match(self):
+        ocr = [_make_ocr("x1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2", 10, 10, w=320)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "CRYPTO_WALLET_BTC" for d in dets)
