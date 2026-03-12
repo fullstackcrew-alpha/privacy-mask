@@ -13,6 +13,10 @@ def _make_rules():
         DetectionRule(name="IP_ADDRESS", pattern=r"(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)", description="IP", enabled=True),
         DetectionRule(name="BIRTHDAY", pattern=r"(?:19|20)\d{2}[\s./-](?:0?[1-9]|1[0-2])[\s./-](?:0?[1-9]|[12]\d|3[01])", description="Birthday", enabled=True),
         DetectionRule(name="BANK_CARD", pattern=r"(?:62|4\d|5[1-5])\d{2}[\s.,-]?\d{4}[\s.,-]?\d{4}[\s.,-]?\d{4}(?:[\s.,-]?\d{1,3})?", description="Bank card", enabled=True),
+        DetectionRule(name="PASSPORT_CN", pattern=r"(?<![A-Za-z0-9])[GEge]\d{8}(?![A-Za-z0-9])", description="Chinese passport number", enabled=True),
+        DetectionRule(name="BIRTHDAY_EN", pattern=r"\d{1,2}\s*(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s*(?:19|20)\d{2}", description="English date", enabled=True),
+        DetectionRule(name="MRZ_LINE1", pattern=r"P[<«.O0][A-Z]{3}[A-Z<«.]{5,}", description="MRZ line 1", enabled=True),
+        DetectionRule(name="MRZ_LINE2", pattern=r"[A-Z0-9][A-Z0-9<«]{29,}", description="MRZ line 2", enabled=True),
     ]
 
 
@@ -166,3 +170,83 @@ class TestDotNormalization:
         rules = _make_rules()
         dets = detect_sensitive(ocr, rules)
         assert len(dets) == 0
+
+
+class TestPassportDetection:
+    """Test passport-related detection rules."""
+
+    def test_passport_cn_g_prefix(self):
+        """Chinese passport number with G prefix."""
+        ocr = [_make_ocr("G22212301", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "PASSPORT_CN" for d in dets)
+
+    def test_passport_cn_e_prefix(self):
+        """Chinese passport number with E prefix."""
+        ocr = [_make_ocr("E12345678", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "PASSPORT_CN" for d in dets)
+
+    def test_passport_cn_no_false_positive_in_longer_string(self):
+        """Should not match passport number embedded in a longer alphanumeric string."""
+        ocr = [_make_ocr("XG222123019", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "PASSPORT_CN" for d in dets)
+
+    def test_birthday_en_no_space(self):
+        """English date without spaces (e.g. 19DEC1996)."""
+        ocr = [_make_ocr("19DEC1996", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "BIRTHDAY_EN" for d in dets)
+
+    def test_birthday_en_with_spaces(self):
+        """English date with spaces (e.g. 19 DEC 1996)."""
+        ocr = [_make_ocr("19 DEC 1996", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "BIRTHDAY_EN" for d in dets)
+
+    def test_birthday_en_lowercase(self):
+        """English date with lowercase month should match (IGNORECASE)."""
+        ocr = [_make_ocr("5jan2000", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "BIRTHDAY_EN" for d in dets)
+
+    def test_mrz_line1(self):
+        """MRZ line 1 with clean < separators."""
+        ocr = [_make_ocr("P<CHNLI<<GUO<<<<<", 10, 10, w=300)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "MRZ_LINE1" for d in dets)
+
+    def test_mrz_line1_ocr_dot_noise(self):
+        """MRZ line 1 where OCR reads < as dots — should be caught by MRZ normalization."""
+        ocr = [_make_ocr("POCHNL.I<<GUO<<<<<", 10, 10, w=300)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "MRZ_LINE1" for d in dets)
+
+    def test_mrz_line2(self):
+        """MRZ line 2 (44-char alphanumeric + filler sequence)."""
+        ocr = [_make_ocr("G222123019CHN5612190M220221119200101<<<<<<44", 10, 10, w=500)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "MRZ_LINE2" for d in dets)
+
+    def test_mrz_line2_short_text_no_match(self):
+        """Short alphanumeric text should not match MRZ_LINE2."""
+        ocr = [_make_ocr("ABC123DEF", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "MRZ_LINE2" for d in dets)
+
+    def test_passport_full_page(self):
+        """Simulate a full passport page with multiple sensitive fields."""
+        ocr = [
+            _make_ocr("G22212301", 100, 50, w=100),
+            _make_ocr("19DEC1996", 100, 100, w=100),
+            _make_ocr("22FEB2012", 100, 150, w=100),
+            _make_ocr("P<CHNLI<<GUO<<<<<", 50, 300, w=400),
+            _make_ocr("G222123019CHN5612190M220221119200101<<<<<<44", 50, 330, w=400),
+        ]
+        dets = detect_sensitive(ocr, _make_rules())
+        all_labels = " ".join(d.label for d in dets)
+        assert "PASSPORT_CN" in all_labels
+        assert "BIRTHDAY_EN" in all_labels
+        assert "MRZ_LINE1" in all_labels
+        assert "MRZ_LINE2" in all_labels

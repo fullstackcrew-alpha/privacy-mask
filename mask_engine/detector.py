@@ -135,7 +135,7 @@ def _find_covering_bboxes(
     return (int(min_left), int(min_top), int(max_right - min_left), int(max_bottom - min_top))
 
 
-def _merge_overlapping_bboxes(detections: list[Detection], margin: int = 5) -> list[Detection]:
+def _merge_overlapping_bboxes(detections: list[Detection], margin: int = 15) -> list[Detection]:
     """Merge detections with overlapping or adjacent bounding boxes."""
     if len(detections) <= 1:
         return detections
@@ -191,6 +191,26 @@ def detect_sensitive(
                     matched_text=match.group(),
                     bbox=bbox,
                 ))
+
+        # MRZ normalization pass: replace « and dots between letters with <
+        # to handle OCR misreading < as « or . in MRZ lines
+        mrz_normalized = re.sub(r'[«]', '<', line_text)
+        mrz_normalized = re.sub(r'(?<=[A-Z])\.(?=[A-Z<])|(?<=[<])\.(?=[A-Z<])', '<', mrz_normalized)
+        if mrz_normalized != line_text:
+            mrz_rules = [r for r in active_rules if r.name.startswith("MRZ_")]
+            for rule in mrz_rules:
+                for match in re.finditer(rule.pattern, mrz_normalized, re.IGNORECASE):
+                    bbox = _find_covering_bboxes(match.start(), match.end(), mapping)
+                    already_found = any(
+                        d.bbox == bbox and d.label == rule.name
+                        for d in detections
+                    )
+                    if not already_found:
+                        detections.append(Detection(
+                            label=rule.name,
+                            matched_text=match.group(),
+                            bbox=bbox,
+                        ))
 
         # Dot-normalization second pass: replace dots between digits with spaces
         # to catch OCR noise like "54019180.1888" → "54019180 1888"
