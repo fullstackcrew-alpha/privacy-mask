@@ -45,7 +45,7 @@ def main():
 
     config = load_config(args.config)
     image = Image.open(args.input)
-    ocr_results = run_ocr(image, config.ocr.languages, config.ocr.min_confidence)
+    ocr_results = run_ocr(image, config.ocr.languages, config.ocr.min_confidence, config.ocr.engine)
     detections = detect_sensitive(ocr_results, config.detection_rules)
 
     preview = image.copy()

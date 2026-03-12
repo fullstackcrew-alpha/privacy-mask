@@ -217,7 +217,7 @@ def run_benchmark(image_dir: str, config_path: str | None = None):
         image = Image.open(img_path)
 
         # Run OCR
-        ocr_results = run_ocr(image, config.ocr.languages, config.ocr.min_confidence)
+        ocr_results = run_ocr(image, config.ocr.languages, config.ocr.min_confidence, config.ocr.engine)
         ocr_text = " ".join(r.text for r in ocr_results)
 
         # Run detection

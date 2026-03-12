@@ -8,7 +8,9 @@ Usage:
 import argparse
 import json
 import os
+import shutil
 import sys
+import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -22,7 +24,11 @@ def main():
     parser.add_argument("--method", "-m", choices=["blur", "fill"], help="Masking method")
     parser.add_argument("--dry-run", "-d", action="store_true", help="Detect only, don't mask")
     parser.add_argument("--config", "-c", help="Path to config.json")
+    parser.add_argument("--in-place", action="store_true", help="Overwrite input file (same as --output <input>)")
     args = parser.parse_args()
+
+    if args.in_place and not args.output:
+        args.output = args.input
 
     if not os.path.isfile(args.input):
         print(json.dumps({"status": "error", "message": f"File not found: {args.input}"}))

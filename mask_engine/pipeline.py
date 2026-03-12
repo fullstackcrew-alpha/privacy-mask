@@ -1,6 +1,8 @@
 """Pipeline module - orchestrates OCR, detection, and masking."""
 
 import os
+import shutil
+import tempfile
 from dataclasses import dataclass, field
 
 from PIL import Image
@@ -18,6 +20,20 @@ class MaskResult:
     detections: list[Detection] = field(default_factory=list)
     summary: str = ""
     dry_run: bool = False
+
+
+def _safe_save(image: Image.Image, output_path: str) -> None:
+    """Save image to output_path, using a temp file + rename for safe in-place overwrite."""
+    output_dir = os.path.dirname(output_path) or "."
+    fd, tmp_path = tempfile.mkstemp(suffix=".png", dir=output_dir)
+    os.close(fd)
+    try:
+        image.save(tmp_path)
+        shutil.move(tmp_path, output_path)
+    except Exception:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+        raise
 
 
 def _generate_output_path(input_path: str, config: Config) -> str:
@@ -55,14 +71,14 @@ def run_pipeline(
 
     image = Image.open(input_path)
 
-    ocr_results = run_ocr(image, config.ocr.languages, config.ocr.min_confidence)
+    ocr_results = run_ocr(image, config.ocr.languages, config.ocr.min_confidence, config.ocr.engine)
 
     detections = detect_sensitive(ocr_results, config.detection_rules)
 
     if not detections:
         summary = "No sensitive information detected."
         if not dry_run:
-            image.save(output_path)
+            _safe_save(image, output_path)
         return MaskResult(
             input_path=input_path,
             output_path=output_path if not dry_run else None,
@@ -82,7 +98,7 @@ def run_pipeline(
 
     if not dry_run:
         masked_image = apply_mask(image, detections, config.masking)
-        masked_image.save(output_path)
+        _safe_save(masked_image, output_path)
 
     return MaskResult(
         input_path=input_path,

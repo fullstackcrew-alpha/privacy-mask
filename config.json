@@ -47,6 +47,7 @@
     "format": "png"
   },
   "ocr": {
+    "engine": "combined",
     "languages": "eng+chi_sim",
     "min_confidence": 30
   }
