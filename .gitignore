@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.playwright-mcp/
+
+# Generated test artifacts (can be regenerated)
+tests/real_screenshots/*.png
+tests/real_screenshots/benchmark_report.json
+tests/real_screenshots/ground_truth.json
