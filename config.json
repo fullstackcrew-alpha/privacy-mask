@@ -42,8 +42,8 @@
     },
     "BIRTHDAY_EN": {
       "enabled": true,
-      "pattern": "\\d{1,2}\\s*(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\\s*(?:19|20)\\d{2}",
-      "description": "Date in English month format (e.g. 19DEC1996)"
+      "pattern": "\\d{1,2}\\s*(?:JAN|FEB|FEV|MAR|APR|AVR|MAY|MAI|JUN|JUIN|JUL|JUIL|AUG|AOUT|SEP|SEPT|OCT|NOV|DEC)(?:/[A-Z]{2,5})?\\s*\\d{2,4}",
+      "description": "Date with month name (EN/FR, 2-4 digit year, e.g. 19DEC1996, 23 APR/AVR 87)"
     },
     "MRZ_LINE1": {
       "enabled": true,

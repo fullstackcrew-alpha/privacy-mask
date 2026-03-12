@@ -14,7 +14,7 @@ def _make_rules():
         DetectionRule(name="BIRTHDAY", pattern=r"(?:19|20)\d{2}[\s./-](?:0?[1-9]|1[0-2])[\s./-](?:0?[1-9]|[12]\d|3[01])", description="Birthday", enabled=True),
         DetectionRule(name="BANK_CARD", pattern=r"(?:62|4\d|5[1-5])\d{2}[\s.,-]?\d{4}[\s.,-]?\d{4}[\s.,-]?\d{4}(?:[\s.,-]?\d{1,3})?", description="Bank card", enabled=True),
         DetectionRule(name="PASSPORT_CN", pattern=r"(?<![A-Za-z0-9])[GEge]\d{8}(?![A-Za-z0-9])", description="Chinese passport number", enabled=True),
-        DetectionRule(name="BIRTHDAY_EN", pattern=r"\d{1,2}\s*(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s*(?:19|20)\d{2}", description="English date", enabled=True),
+        DetectionRule(name="BIRTHDAY_EN", pattern=r"\d{1,2}\s*(?:JAN|FEB|FEV|MAR|APR|AVR|MAY|MAI|JUN|JUIN|JUL|JUIL|AUG|AOUT|SEP|SEPT|OCT|NOV|DEC)(?:/[A-Z]{2,5})?\s*\d{2,4}", description="EN/FR date", enabled=True),
         DetectionRule(name="MRZ_LINE1", pattern=r"P[<«.O0][A-Z]{3}[A-Z<«.]{5,}", description="MRZ line 1", enabled=True),
         DetectionRule(name="MRZ_LINE2", pattern=r"[A-Z0-9][A-Z0-9<«]{29,}", description="MRZ line 2", enabled=True),
     ]
@@ -208,6 +208,30 @@ class TestPassportDetection:
     def test_birthday_en_lowercase(self):
         """English date with lowercase month should match (IGNORECASE)."""
         ocr = [_make_ocr("5jan2000", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "BIRTHDAY_EN" for d in dets)
+
+    def test_birthday_en_2digit_year(self):
+        """Date with 2-digit year (e.g. 23 APR 87)."""
+        ocr = [_make_ocr("23 APR 87", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "BIRTHDAY_EN" for d in dets)
+
+    def test_birthday_en_bilingual(self):
+        """Bilingual date format (e.g. APR/AVR)."""
+        ocr = [_make_ocr("23 APR/AVR 87", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "BIRTHDAY_EN" for d in dets)
+
+    def test_birthday_en_french_month(self):
+        """French month name (e.g. 27 AOUT 22)."""
+        ocr = [_make_ocr("27 AOUT 22", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any(d.label == "BIRTHDAY_EN" for d in dets)
+
+    def test_birthday_en_bilingual_long(self):
+        """Bilingual date with longer French month (e.g. AUG/AOUT)."""
+        ocr = [_make_ocr("27 AUG/AOUT 22", 10, 10, w=130)]
         dets = detect_sensitive(ocr, _make_rules())
         assert any(d.label == "BIRTHDAY_EN" for d in dets)
 
