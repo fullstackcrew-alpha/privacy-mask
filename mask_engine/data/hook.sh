@@ -6,15 +6,22 @@
 set -euo pipefail
 
 CACHE_DIR="$HOME/.claude/image-cache"
-MASKED_LIST="/tmp/masked_images_$(id -u).txt"
-LOG_FILE="/tmp/privacy-mask-hook.log"
+STATE_DIR="$HOME/.claude/privacy-mask"
+mkdir -p "$STATE_DIR"
+MASKED_LIST="$STATE_DIR/masked.txt"
+LOG_FILE="$STATE_DIR/hook.log"
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG_FILE"
 }
 
+# Rotate log if > 1MB
+if [ -f "$LOG_FILE" ] && [ "$(wc -c < "$LOG_FILE")" -gt 1048576 ]; then
+    mv "$LOG_FILE" "$LOG_FILE.old"
+fi
+
 HOOK_INPUT=$(cat)
-log "Hook triggered. Input: $HOOK_INPUT"
+log "Hook triggered."
 
 SESSION_ID=$(echo "$HOOK_INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null)
 if [ -z "$SESSION_ID" ]; then
@@ -49,7 +56,6 @@ PM_CMD=""
 if command -v privacy-mask &>/dev/null; then
     PM_CMD="privacy-mask"
 else
-    # Try common locations
     for p in "$HOME/.local/bin/privacy-mask" "$HOME/miniconda3/bin/privacy-mask" "$HOME/anaconda3/bin/privacy-mask"; do
         if [ -x "$p" ]; then
             PM_CMD="$p"
@@ -81,8 +87,9 @@ for img in "${RECENT_IMAGES[@]}"; do
     fi
 done
 
+# Trim masked list (keep last 200 entries)
 if [ -f "$MASKED_LIST" ] && [ "$(wc -l < "$MASKED_LIST")" -gt 500 ]; then
-    tail -200 "$MASKED_LIST" > "${MASKED_LIST}.tmp" && mv "${MASKED_LIST}.tmp" "$MASKED_LIST"
+    tail -200 "$MASKED_LIST" > "$MASKED_LIST.tmp" && mv "$MASKED_LIST.tmp" "$MASKED_LIST"
 fi
 
 if [ $MASKED_COUNT -gt 0 ]; then

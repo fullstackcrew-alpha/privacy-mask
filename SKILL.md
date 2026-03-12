@@ -1,59 +1,61 @@
 ---
 name: privacy-mask
-description: Mask sensitive information (phone numbers, emails, IDs, API keys) in screenshots before analysis. Use when receiving screenshots that may contain private data, or when the user mentions privacy/masking/脱敏/打码.
+description: Mask sensitive information (phone numbers, emails, IDs, API keys, crypto wallets, etc.) in screenshots before analysis. Use when receiving screenshots that may contain private data, or when the user mentions privacy/masking/脱敏/打码.
+license: MIT
+compatibility: Requires tesseract OCR and Python 3.10+. All processing is local and offline.
+metadata:
+  author: wuhao
+  version: "0.1.0"
 ---
 
-# Privacy Mask Tool
+# Privacy Mask
 
-Automatically detect and mask sensitive information in images before analyzing them.
+Detect and mask sensitive information in images locally before they leave your machine.
 
-## Setup (first time only)
+## When to use
+
+- User sends a screenshot that may contain private data
+- User mentions privacy, masking, 脱敏, or 打码
+- You need to analyze an image but want to redact sensitive info first
+
+## Quick start
 
 ```bash
-cd /Users/wuhao/Documents/CornerExplore/local-image-privacy-mask
-bash setup.sh
+pip install privacy-mask
+privacy-mask install   # one-time: sets up global Claude Code hook
 ```
 
-## Usage
+After install, all images are automatically masked before upload. No further action needed.
 
-### Mask an image before analysis
+## Manual usage
 
-When you receive a screenshot or image path that may contain sensitive information:
-
-1. Run the masking tool:
+Mask an image:
 ```bash
-cd /Users/wuhao/Documents/CornerExplore/local-image-privacy-mask && source venv/bin/activate && python3 scripts/mask_image.py "<image_path>"
+privacy-mask mask <image_path>
+privacy-mask mask <image_path> --in-place
+privacy-mask mask <image_path> --dry-run   # detect only
 ```
 
-2. The tool outputs JSON with the masked image path. Use the masked image for analysis instead of the original.
-
-3. If the tool reports detections, always use the masked version. Tell the user what categories were detected (e.g., "Found 2 phone numbers and 1 email, using masked version").
-
-### Preview detections (no masking)
-
-To check what would be detected without masking:
-```bash
-cd /Users/wuhao/Documents/CornerExplore/local-image-privacy-mask && source venv/bin/activate && python3 scripts/preview_detections.py "<image_path>"
+Output is JSON:
+```json
+{
+  "status": "success",
+  "detections": [{"label": "PHONE_CN", "text": "***", "bbox": [10, 20, 100, 30]}],
+  "summary": "Masked 1 regions: 1 PHONE_CN"
+}
 ```
 
-### Options
+## What it detects (47 rules)
 
-- `--method blur|fill` - Masking method (default: blur)
-- `--dry-run` - Detect only, don't create masked image
-- `--output <path>` - Custom output path
-
-## What it detects
-
-- Chinese phone numbers (手机号)
-- Email addresses (邮箱)
-- Chinese ID card numbers (身份证号)
-- Birthdays (生日)
-- IP addresses
-- API keys / tokens / secrets
-- Bank card numbers (银行卡号)
+- **IDs**: Chinese ID card, passport, HK/TW ID, US SSN, UK NINO, Canadian SIN, Indian Aadhaar/PAN, Korean RRN, Singapore NRIC, Malaysian IC
+- **Phone**: Chinese mobile/landline, US phone, international (+prefix)
+- **Financial**: Bank card, Amex, IBAN, SWIFT/BIC
+- **Developer keys**: AWS, GitHub, Slack, Google, Stripe tokens, JWT, connection strings, API keys, SSH/PEM keys
+- **Crypto**: Bitcoin, Ethereum wallet addresses
+- **Other**: Email, birthday, IP/IPv6, MAC, UUID, license plate, MRZ, URL auth tokens
 
 ## Important
 
-- All processing is **local and offline** - no data leaves the machine
-- The tool uses Tesseract OCR (must be installed via `brew install tesseract`)
-- Configure detection rules in `config.json`
+- All processing is **local and offline** — no data leaves the machine
+- The hook intercepts images **before** upload to cloud API
+- Configure rules in the bundled `config.json` or pass `--config` for custom rules

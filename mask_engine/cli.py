@@ -12,10 +12,10 @@ import os
 import shutil
 import stat
 import sys
+import tempfile
 from importlib import resources
 
-
-HOOK_ID_COMMENT = "# privacy-mask-hook"
+from . import __version__
 
 
 def _get_claude_settings_path():
@@ -27,13 +27,36 @@ def _get_hook_install_dir():
 
 
 def _get_bundled_hook_path():
-    """Get path to the bundled hook.sh template."""
     return str(resources.files("mask_engine").joinpath("data/hook.sh"))
 
 
-def _get_bundled_config_path():
-    """Get path to the bundled config.json."""
-    return str(resources.files("mask_engine").joinpath("data/config.json"))
+def _atomic_json_write(path: str, data: dict) -> None:
+    """Write JSON atomically using tempfile + os.replace."""
+    dir_name = os.path.dirname(path)
+    os.makedirs(dir_name, exist_ok=True)
+    fd, tmp_path = tempfile.mkstemp(suffix=".json", dir=dir_name)
+    try:
+        with os.fdopen(fd, "w") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+            f.write("\n")
+        os.replace(tmp_path, path)
+    except Exception:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+        raise
+
+
+def _load_settings(path: str) -> dict:
+    """Load Claude settings.json safely."""
+    if not os.path.isfile(path):
+        return {}
+    try:
+        with open(path, "r") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"[ERROR] Cannot parse {path}: {e}", file=sys.stderr)
+        print("Please fix or remove the file and try again.", file=sys.stderr)
+        sys.exit(1)
 
 
 def cmd_mask(args):
@@ -86,11 +109,8 @@ def cmd_install(args):
     shutil.copy2(src_hook, dest_hook)
     os.chmod(dest_hook, os.stat(dest_hook).st_mode | stat.S_IEXEC)
 
-    # 2. Update ~/.claude/settings.json
-    settings = {}
-    if os.path.isfile(settings_path):
-        with open(settings_path, "r") as f:
-            settings = json.load(f)
+    # 2. Update ~/.claude/settings.json atomically
+    settings = _load_settings(settings_path)
 
     hooks = settings.setdefault("hooks", {})
     submit_hooks = hooks.setdefault("UserPromptSubmit", [])
@@ -114,9 +134,7 @@ def cmd_install(args):
                 }
             ],
         })
-
-        with open(settings_path, "w") as f:
-            json.dump(settings, f, indent=4, ensure_ascii=False)
+        _atomic_json_write(settings_path, settings)
 
     print(f"[OK] Hook installed: {dest_hook}")
     print(f"[OK] Settings updated: {settings_path}")
@@ -141,8 +159,7 @@ def cmd_uninstall(args):
 
     # 2. Remove from settings
     if os.path.isfile(settings_path):
-        with open(settings_path, "r") as f:
-            settings = json.load(f)
+        settings = _load_settings(settings_path)
 
         submit_hooks = settings.get("hooks", {}).get("UserPromptSubmit", [])
         filtered = []
@@ -160,14 +177,11 @@ def cmd_uninstall(args):
 
         if removed:
             settings["hooks"]["UserPromptSubmit"] = filtered
-            # Clean up empty structures
             if not settings["hooks"]["UserPromptSubmit"]:
                 del settings["hooks"]["UserPromptSubmit"]
             if not settings["hooks"]:
                 del settings["hooks"]
-
-            with open(settings_path, "w") as f:
-                json.dump(settings, f, indent=4, ensure_ascii=False)
+            _atomic_json_write(settings_path, settings)
             print(f"[OK] Settings cleaned: {settings_path}")
         else:
             print(f"[--] No privacy-mask hook found in settings")
@@ -181,21 +195,24 @@ def main():
         prog="privacy-mask",
         description="Local image privacy masking — detect and redact sensitive info before images leave your machine.",
     )
+    parser.add_argument(
+        "--version", "-V", action="version",
+        version=f"%(prog)s {__version__}",
+    )
     subparsers = parser.add_subparsers(dest="command")
 
     # mask subcommand
     mask_parser = subparsers.add_parser("mask", help="Mask sensitive info in an image")
     mask_parser.add_argument("input", help="Path to input image")
-    mask_parser.add_argument("--output", "-o", help="Output path")
+    output_group = mask_parser.add_mutually_exclusive_group()
+    output_group.add_argument("--output", "-o", help="Output path")
+    output_group.add_argument("--in-place", action="store_true", help="Overwrite input file")
     mask_parser.add_argument("--method", "-m", choices=["blur", "fill"], help="Masking method")
     mask_parser.add_argument("--dry-run", "-d", action="store_true", help="Detect only, don't mask")
     mask_parser.add_argument("--config", "-c", help="Path to config.json")
-    mask_parser.add_argument("--in-place", action="store_true", help="Overwrite input file")
 
-    # install subcommand
+    # install / uninstall
     subparsers.add_parser("install", help="Install global Claude Code hook")
-
-    # uninstall subcommand
     subparsers.add_parser("uninstall", help="Remove global Claude Code hook")
 
     args = parser.parse_args()

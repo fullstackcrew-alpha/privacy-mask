@@ -3,6 +3,10 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .playwright-mcp/
+*.egg-info/
+build/
+dist/
+.eggs/
 
 # Generated test artifacts (can be regenerated)
 tests/real_screenshots/*.png
