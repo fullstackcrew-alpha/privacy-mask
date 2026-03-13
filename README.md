@@ -18,9 +18,9 @@
 
 | Original | Masked |
 |----------|--------|
-| ![before](examples/demo_form_before.png) | ![after](examples/demo_before_after_form.png) |
-| ![before](examples/demo_terminal_before.png) | ![after](examples/demo_terminal_masked.png) |
-| ![before](examples/demo_chat_before.png) | ![after](examples/demo_chat_masked.png) |
+| ![before](https://raw.githubusercontent.com/fullstackcrew-alpha/privacy-mask/main/examples/demo_form_before.png) | ![after](https://raw.githubusercontent.com/fullstackcrew-alpha/privacy-mask/main/examples/demo_before_after_form.png) |
+| ![before](https://raw.githubusercontent.com/fullstackcrew-alpha/privacy-mask/main/examples/demo_terminal_before.png) | ![after](https://raw.githubusercontent.com/fullstackcrew-alpha/privacy-mask/main/examples/demo_terminal_masked.png) |
+| ![before](https://raw.githubusercontent.com/fullstackcrew-alpha/privacy-mask/main/examples/demo_chat_before.png) | ![after](https://raw.githubusercontent.com/fullstackcrew-alpha/privacy-mask/main/examples/demo_chat_masked.png) |
 
 ---
 
