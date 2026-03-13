@@ -31,7 +31,9 @@ dependencies = [
 privacy-mask = "mask_engine.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/wuhao/privacy-mask"
+Homepage = "https://github.com/fullstackcrew-alpha/privacy-mask"
+Repository = "https://github.com/fullstackcrew-alpha/privacy-mask"
+Issues = "https://github.com/fullstackcrew-alpha/privacy-mask/issues"
 
 [tool.setuptools.packages.find]
 include = ["mask_engine*"]

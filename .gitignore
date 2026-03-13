@@ -12,3 +12,6 @@ dist/
 tests/real_screenshots/*.png
 tests/real_screenshots/benchmark_report.json
 tests/real_screenshots/ground_truth.json
+
+# Root config.json is a duplicate of mask_engine/data/config.json
+/config.json

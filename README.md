@@ -6,7 +6,7 @@
   <p align="center">
     <a href="https://pypi.org/project/privacy-mask/"><img src="https://img.shields.io/pypi/v/privacy-mask" alt="PyPI version"></a>
     <a href="https://pypi.org/project/privacy-mask/"><img src="https://img.shields.io/pypi/pyversions/privacy-mask" alt="Python 3.10+"></a>
-    <a href="https://github.com/wuhao/privacy-mask/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
+    <a href="https://github.com/fullstackcrew-alpha/privacy-mask/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
   </p>
 </p>
 
