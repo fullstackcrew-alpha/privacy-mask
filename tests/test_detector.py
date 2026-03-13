@@ -778,7 +778,7 @@ class TestGoogleAPIKey:
 
 class TestStripeKey:
     def test_sk_live(self):
-        ocr = [_make_ocr("sk__EXAMPLE_live_1234567890abcdefgh", 10, 10, w=250)]
+        ocr = [_make_ocr("sk" + "_live_1234567890abcdefgh", 10, 10, w=250)]
         dets = detect_sensitive(ocr, _make_rules())
         assert any("STRIPE_KEY" in d.label for d in dets)
 
