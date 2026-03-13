@@ -4,6 +4,7 @@
     <strong>Detect and redact sensitive information in images — 100% local, 100% offline.</strong>
   </p>
   <p align="center">
+    <a href="https://github.com/fullstackcrew-alpha/privacy-mask/actions/workflows/ci.yml"><img src="https://github.com/fullstackcrew-alpha/privacy-mask/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
     <a href="https://pypi.org/project/privacy-mask/"><img src="https://img.shields.io/pypi/v/privacy-mask" alt="PyPI version"></a>
     <a href="https://pypi.org/project/privacy-mask/"><img src="https://img.shields.io/pypi/pyversions/privacy-mask" alt="Python 3.10+"></a>
     <a href="https://github.com/fullstackcrew-alpha/privacy-mask/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
@@ -194,7 +195,7 @@ Contributions are welcome! Here's how you can help:
 - **Add detection rules** — submit new regex patterns for your country's ID format
 - **Improve OCR accuracy** — better preprocessing strategies
 - **Report false positives** — help us tune regex patterns
-- **Add tests** — currently 174 tests, always room for more
+- **Add tests** — currently 208 tests, always room for more
 
 ```bash
 # Run tests
