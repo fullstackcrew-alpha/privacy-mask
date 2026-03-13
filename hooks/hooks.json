@@ -1,0 +1,8 @@
+{
+  "hooks": [
+    {
+      "event": "UserPromptSubmit",
+      "command": "${CLAUDE_PLUGIN_ROOT}/scripts/mask-images.sh"
+    }
+  ]
+}

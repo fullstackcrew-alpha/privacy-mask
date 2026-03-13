@@ -62,7 +62,7 @@ privacy-mask follows the [agentskills.io](https://agentskills.io) SKILL.md stand
 
 | Platform | How it works |
 |----------|-------------|
-| **Claude Code** | Hook auto-masks images before upload |
+| **Claude Code** | `pip install privacy-mask && privacy-mask install` or `/plugin marketplace add fullstackcrew-alpha/privacy-mask` then `/plugin install privacy-mask@privacy-mask` |
 | **Cursor** | SKILL.md auto-detected in project |
 | **VS Code Copilot** | SKILL.md auto-detected in project |
 | **Gemini CLI** | SKILL.md auto-detected in project |

@@ -1,0 +1,9 @@
+{
+  "name": "privacy-mask",
+  "version": "0.2.0",
+  "description": "Auto-mask sensitive info in images before AI upload. 100% local.",
+  "author": {"name": "fullstackcrew-alpha"},
+  "repository": "https://github.com/fullstackcrew-alpha/privacy-mask",
+  "license": "MIT",
+  "keywords": ["privacy", "masking", "ocr", "sensitive-data"]
+}

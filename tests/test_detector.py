@@ -16,7 +16,7 @@ def _make_rules():
         DetectionRule(name="PASSPORT_CN", pattern=r"(?<![A-Za-z0-9])[GEge]\d{8}(?![A-Za-z0-9])", description="Chinese passport number", enabled=True),
         DetectionRule(name="BIRTHDAY_EN", pattern=r"\d{1,2}\s*(?:JAN|FEB|FEV|MAR|APR|AVR|MAY|MAI|JUN|JUIN|JUL|JUIL|AUG|AOUT|SEP|SEPT|OCT|NOV|DEC)(?:/[A-Z]{2,5})?\s*\d{2,4}", description="EN/FR date", enabled=True),
         DetectionRule(name="MRZ_LINE1", pattern=r"P[<«.O0][A-Z]{3}[A-Z<«.]{5,}", description="MRZ line 1", enabled=True),
-        DetectionRule(name="MRZ_LINE2", pattern=r"[A-Z0-9][A-Z0-9<«]{29,}", description="MRZ line 2", enabled=True),
+        DetectionRule(name="MRZ_LINE2", pattern=r"(?=[A-Z0-9<«]*[<«])[A-Z0-9<«]{30,}", description="MRZ line 2", enabled=True),
         DetectionRule(name="LICENSE_PLATE_CN", pattern=r"[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤川青藏琼宁][A-HJ-NP-Z][A-HJ-NP-Z0-9]{4,5}[A-HJ-NP-Z0-9挂学警港澳]?", description="License plate", enabled=True),
         DetectionRule(name="UNIFIED_CREDIT_CODE", pattern=r"[0-9]{2}[0-9]{6}[0-9A-HJ-NP-RTUW-Y]{10}", description="Credit code", enabled=True),
         DetectionRule(name="PHONE_CN_LANDLINE", pattern=r"0[1-9]\d{1,2}[\s-]\d{7,8}", description="Landline", enabled=True),
@@ -48,7 +48,7 @@ def _make_rules():
         DetectionRule(name="INDIAN_PAN", pattern=r"(?<![A-Za-z0-9])[A-Z]{5}\d{4}[A-Z](?![A-Za-z0-9])", description="Indian PAN", enabled=True),
         DetectionRule(name="KOREAN_RRN", pattern=r"(?<!\d)\d{6}-[1-4]\d{6}(?!\d)", description="Korean RRN", enabled=True),
         DetectionRule(name="SINGAPORE_NRIC", pattern=r"(?<![A-Za-z0-9])[STFGM]\d{7}[A-Z](?![A-Za-z0-9])", description="SG NRIC", enabled=True),
-        DetectionRule(name="SWIFT_BIC", pattern=r"(?<![A-Za-z0-9])[A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?(?![A-Za-z0-9])", description="SWIFT/BIC", enabled=True),
+        DetectionRule(name="SWIFT_BIC", pattern=r"(?<![A-Za-z0-9])[A-Z]{4}(?:AD|AE|AF|AG|AI|AL|AM|AO|AR|AS|AT|AU|AW|AZ|BA|BB|BD|BE|BF|BG|BH|BI|BJ|BM|BN|BO|BR|BS|BT|BW|BY|BZ|CA|CD|CF|CG|CH|CI|CK|CL|CM|CN|CO|CR|CU|CV|CW|CY|CZ|DE|DJ|DK|DM|DO|DZ|EC|EE|EG|ER|ES|ET|FI|FJ|FK|FM|FO|FR|GA|GB|GD|GE|GH|GI|GL|GM|GN|GP|GQ|GR|GT|GU|GW|GY|HK|HN|HR|HT|HU|ID|IE|IL|IM|IN|IQ|IR|IS|IT|JE|JM|JO|JP|KE|KG|KH|KI|KN|KP|KR|KW|KY|KZ|LA|LB|LC|LI|LK|LR|LS|LT|LU|LV|LY|MA|MC|MD|ME|MG|MH|MK|ML|MM|MN|MO|MP|MQ|MR|MS|MT|MU|MV|MW|MX|MY|MZ|NA|NC|NE|NF|NG|NI|NL|NO|NP|NR|NU|NZ|OM|PA|PE|PF|PG|PH|PK|PL|PM|PN|PR|PS|PT|PW|PY|QA|RE|RO|RS|RU|RW|SA|SB|SC|SD|SE|SG|SH|SI|SK|SL|SM|SN|SO|SR|SS|ST|SV|SX|SY|SZ|TC|TD|TG|TH|TJ|TK|TL|TM|TN|TO|TR|TT|TV|TW|TZ|UA|UG|UM|US|UY|UZ|VA|VC|VE|VG|VI|VN|VU|WF|WS|XK|YE|YT|ZA|ZM|ZW)[A-Z0-9]{2}(?:[A-Z0-9]{3})?(?![A-Za-z0-9])", description="SWIFT/BIC", enabled=True),
         DetectionRule(name="CRYPTO_WALLET_ETH", pattern=r"(?<![A-Za-z0-9])0x[0-9a-fA-F]{40}(?![A-Za-z0-9])", description="ETH wallet", enabled=True),
         DetectionRule(name="PHONE_US", pattern=r"(?<!\d)\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}(?!\d)", description="US phone", enabled=True),
         DetectionRule(name="JWT_TOKEN", pattern=r"eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}", description="JWT", enabled=True),
@@ -297,6 +297,18 @@ class TestPassportDetection:
         ocr = [_make_ocr("ABC123DEF", 10, 10, w=80)]
         dets = detect_sensitive(ocr, _make_rules())
         assert not any(d.label == "MRZ_LINE2" for d in dets)
+
+    def test_mrz_line2_long_text_no_chevron_no_match(self):
+        """Long uppercase text without MRZ chevrons should not match."""
+        for text in [
+            "NPMJSCOMSETTINGSFULLSTACKCREWTOKEN",
+            "GRANULARACCESSTOKENSPROVIDETHEMOST",
+            "YOUMUSTSELECTATLEASTONEORGANIZATION",
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345678",
+        ]:
+            ocr = [_make_ocr(text, 10, 10, w=400)]
+            dets = detect_sensitive(ocr, _make_rules())
+            assert not any(d.label == "MRZ_LINE2" for d in dets), f"'{text}' should not match MRZ_LINE2"
 
     def test_passport_full_page(self):
         """Simulate a full passport page with multiple sensitive fields."""
@@ -976,6 +988,43 @@ class TestSWIFTBIC:
         ocr = [_make_ocr("DEUT", 10, 10, w=40)]
         dets = detect_sensitive(ocr, _make_rules())
         assert not any(d.label == "SWIFT_BIC" for d in dets)
+
+    def test_false_positive_tostring(self):
+        """Common English words should not match SWIFT_BIC."""
+        ocr = [_make_ocr("TOSTRING", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "SWIFT_BIC" for d in dets)
+
+    def test_false_positive_abcdefgh(self):
+        """Arbitrary 8 uppercase letters should not match SWIFT_BIC."""
+        ocr = [_make_ocr("ABCDEFGH", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "SWIFT_BIC" for d in dets)
+
+    def test_false_positive_keywords(self):
+        """Programming keywords should not match SWIFT_BIC."""
+        for word in ["OVERRIDE", "ABSTRACT", "FUNCTION", "DEBUGGER", "READONLY"]:
+            ocr = [_make_ocr(word, 10, 10, w=80)]
+            dets = detect_sensitive(ocr, _make_rules())
+            assert not any(d.label == "SWIFT_BIC" for d in dets), f"{word} should not match SWIFT_BIC"
+
+    def test_valid_bic_bnpafrpp(self):
+        """BNP Paribas France BIC should match."""
+        ocr = [_make_ocr("BNPAFRPP", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("SWIFT_BIC" in d.label for d in dets)
+
+    def test_valid_bic_cobadeff(self):
+        """Commerzbank Germany BIC should match."""
+        ocr = [_make_ocr("COBADEFF", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("SWIFT_BIC" in d.label for d in dets)
+
+    def test_valid_bic_with_branch(self):
+        """SWIFT BIC with branch code should match."""
+        ocr = [_make_ocr("BNPAFRPP075", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("SWIFT_BIC" in d.label for d in dets)
 
 
 class TestCryptoWalletETH:
