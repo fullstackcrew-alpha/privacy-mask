@@ -27,6 +27,17 @@ gh auth switch -u fullstackcrew-alpha
 
 Switch back after if needed: `gh auth switch -u haowu77`
 
+## ClawHub Publish
+
+```bash
+clawhub whoami                # verify logged in as fullstackcrew-alpha
+clawhub publish . --version <semver> --changelog "description"
+```
+
+- `--version` is required (valid semver)
+- `.clawhubignore` controls which files are included
+- SKILL.md frontmatter provides metadata
+
 ## Key Conventions
 
 - **No real secrets in source**: never write literal Stripe/AWS/GitHub test keys; use runtime string construction to avoid push protection triggers

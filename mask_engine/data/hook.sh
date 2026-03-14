@@ -3,7 +3,9 @@
 # Intercepts images in Claude's image cache and masks them LOCALLY
 # before they are sent to the cloud API.
 
-set -euo pipefail
+# Never exit non-zero — hook errors disrupt the user's Claude Code experience
+trap 'exit 0' ERR
+set -uo pipefail
 
 CACHE_DIR="$HOME/.claude/image-cache"
 STATE_DIR="$HOME/.claude/privacy-mask"

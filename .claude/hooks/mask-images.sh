@@ -2,7 +2,9 @@
 # UserPromptSubmit hook: intercept images in Claude's image cache and mask them in-place
 # before they are sent to the cloud API.
 
-set -euo pipefail
+# Never exit non-zero — hook errors disrupt the user's Claude Code experience
+trap 'exit 0' ERR
+set -uo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 CACHE_DIR="$HOME/.claude/image-cache"
