@@ -1,17 +1,15 @@
 ---
 name: privacy-mask
 description: >-
-  Mask and redact sensitive information (PII) in screenshots and images before
-  analysis — phone numbers, emails, IDs, API keys, crypto wallets, credit cards,
-  passwords, and more. Uses OCR (Tesseract + RapidOCR) and optional NER (GLiNER)
-  to detect private data and applies redaction overlays. One-time setup requires
-  pip install (network) and global hook registration; after that, all image
-  processing is fully local and offline — no data leaves your machine. Use when
-  receiving screenshots that may contain private data, or when the user mentions
-  privacy / masking / redacting / PII removal / sensitive data protection.
-version: 0.3.0
+  Mask and redact sensitive information (PII) in screenshots and images —
+  phone numbers, emails, IDs, API keys, crypto wallets, credit cards,
+  passwords, and more. Uses OCR (Tesseract + RapidOCR) with 47 regex rules
+  and optional NER (GLiNER) to detect private data and applies blur/fill
+  redaction overlays. All processing runs locally and offline — no data
+  leaves your machine.
+version: 0.3.1
 license: MIT
-compatibility: Requires tesseract OCR and Python 3.10+. One-time pip install requires network; all subsequent image processing is local and offline.
+compatibility: Requires tesseract OCR, Python 3.10+, and pre-installed privacy-mask CLI.
 metadata:
   author: wuhao
   openclaw:
@@ -19,35 +17,20 @@ metadata:
       bins:
         - tesseract
         - python3
+        - privacy-mask
     emoji: "\U0001F6E1"
     homepage: https://github.com/fullstackcrew-alpha/privacy-mask
   permissions:
-    - id: pip-install
+    - id: local-file-read
       description: >-
-        One-time: runs "pip install privacy-mask" to install the CLI tool and
-        its dependencies (Pillow, pytesseract, rapidocr-onnxruntime) from PyPI.
-        This is the only step that requires network access.
-      scope: global
-      optional: false
-    - id: global-hook-install
-      description: >-
-        One-time: runs "privacy-mask install" to register a UserPromptSubmit
-        hook in ~/.claude/settings.json. The hook script is bundled in the
-        package at mask_engine/data/hook.sh — no remote code is fetched.
-      scope: global
-      optional: false
-    - id: image-cache-read
-      description: >-
-        At runtime, the hook reads images from ~/.claude/image-cache/ to
-        perform local OCR-based detection before the image is sent to the API.
-        Images are processed in-place; no copies are made or transmitted.
+        Reads image files provided by the user to perform OCR-based
+        sensitive information detection. No files are copied or transmitted.
       scope: local
       optional: false
-    - id: agent-behavior-modify
+    - id: local-file-write
       description: >-
-        The hook masks (blurs) detected sensitive regions in images before
-        upload, ensuring PII never leaves the machine. This modifies the
-        image content that the agent sends to the API.
+        Writes masked output images to the local filesystem (same directory
+        as input, with _masked suffix, or user-specified path).
       scope: local
       optional: false
 ---
@@ -56,28 +39,28 @@ metadata:
 
 Detect and mask sensitive information in images locally before they leave your machine.
 
+## Prerequisites
+
+The `privacy-mask` CLI must be installed before using this skill:
+
+```
+pip install privacy-mask
+```
+
 ## When to use
 
 - User sends a screenshot that may contain private data
 - User mentions privacy, masking, or redacting
 - You need to analyze an image but want to redact sensitive info first
 
-## Quick start
-
-```bash
-pip install privacy-mask
-privacy-mask install   # one-time: sets up global Claude Code hook
-```
-
-After install, all images are automatically masked before upload. No further action needed.
-
-## Manual usage
+## Usage
 
 Mask an image:
 ```bash
 privacy-mask mask <image_path>
 privacy-mask mask <image_path> --in-place
 privacy-mask mask <image_path> --dry-run   # detect only
+privacy-mask mask <image_path> --detection-engine regex  # use regex instead of NER
 ```
 
 Output is JSON:
@@ -89,7 +72,7 @@ Output is JSON:
 }
 ```
 
-## What it detects (47 rules)
+## What it detects
 
 - **IDs**: Chinese ID card, passport, HK/TW ID, US SSN, UK NINO, Canadian SIN, Indian Aadhaar/PAN, Korean RRN, Singapore NRIC, Malaysian IC
 - **Phone**: Chinese mobile/landline, US phone, international (+prefix)
@@ -97,9 +80,9 @@ Output is JSON:
 - **Developer keys**: AWS, GitHub, Slack, Google, Stripe tokens, JWT, connection strings, API keys, SSH/PEM keys
 - **Crypto**: Bitcoin, Ethereum wallet addresses
 - **Other**: Email, birthday, IP/IPv6, MAC, UUID, license plate, MRZ, URL auth tokens
+- **NER** (optional): Person names, street addresses, organizations, dates of birth, medical conditions
 
 ## Important
 
 - All processing is **local and offline** — no data leaves the machine
-- The hook intercepts images **before** upload to cloud API
 - Configure rules in the bundled `config.json` or pass `--config` for custom rules
