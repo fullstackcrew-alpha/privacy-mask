@@ -1,4 +1,4 @@
-# Only publish SKILL.md and docs, exclude everything else
+# Only publish SKILL.md + essential docs, exclude everything else
 hooks/
 scripts/
 tests/
@@ -6,9 +6,19 @@ mask_engine/
 examples/
 .claude-plugin/
 .github/
+docs/
 *.sh
 *.py
 *.toml
 *.txt
 *.json
+*.png
+*.svg
 skills/
+README.md
+README.zh.md
+CLAUDE.md
+CHANGELOG.md
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+LICENSE

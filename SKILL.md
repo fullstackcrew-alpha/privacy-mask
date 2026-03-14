@@ -7,7 +7,7 @@ description: >-
   and optional NER (GLiNER) to detect private data and applies blur/fill
   redaction overlays. All processing runs locally and offline — no data
   leaves your machine.
-version: 0.3.1
+version: 0.3.3
 license: MIT
 compatibility: Requires tesseract OCR, Python 3.10+, and pre-installed privacy-mask CLI.
 metadata:
@@ -41,11 +41,8 @@ Detect and mask sensitive information in images locally before they leave your m
 
 ## Prerequisites
 
-The `privacy-mask` CLI must be installed before using this skill:
-
-```
-pip install privacy-mask
-```
+This skill requires the `privacy-mask` CLI to be pre-installed on the system.
+If it is not available, inform the user that they need to install it first.
 
 ## When to use
 
