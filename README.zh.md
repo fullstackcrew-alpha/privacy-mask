@@ -65,6 +65,13 @@ privacy-mask install
 
 运行 `privacy-mask install` 后，每次你给 AI 编程助手发送图片都会自动打码。
 
+```bash
+# 开关控制
+privacy-mask off       # 临时关闭打码
+privacy-mask on        # 重新开启
+privacy-mask status    # 查看当前状态
+```
+
 ---
 
 ## AI 工具集成

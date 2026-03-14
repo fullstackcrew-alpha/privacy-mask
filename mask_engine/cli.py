@@ -4,6 +4,9 @@ Usage:
     privacy-mask mask <image> [--output <path>] [--method blur|fill] [--dry-run] [--in-place]
     privacy-mask install    # Install global Claude Code hook
     privacy-mask uninstall  # Remove global Claude Code hook
+    privacy-mask on         # Enable masking (default)
+    privacy-mask off        # Disable masking temporarily
+    privacy-mask status     # Show current status
 """
 
 import argparse
@@ -28,6 +31,34 @@ def _get_hook_install_dir():
 
 def _get_bundled_hook_path():
     return str(resources.files("mask_engine").joinpath("data/hook.sh"))
+
+
+def _get_state_dir():
+    return os.path.expanduser("~/.claude/privacy-mask")
+
+
+def _get_enabled_file():
+    return os.path.join(_get_state_dir(), "enabled")
+
+
+def _is_enabled():
+    """Check if privacy-mask is enabled. Enabled by default."""
+    enabled_file = _get_enabled_file()
+    if not os.path.isfile(enabled_file):
+        return True  # enabled by default
+    try:
+        with open(enabled_file, "r") as f:
+            return f.read().strip() == "1"
+    except OSError:
+        return True
+
+
+def _set_enabled(enabled: bool):
+    """Set the enabled state."""
+    state_dir = _get_state_dir()
+    os.makedirs(state_dir, exist_ok=True)
+    with open(_get_enabled_file(), "w") as f:
+        f.write("1" if enabled else "0")
 
 
 def _atomic_json_write(path: str, data: dict) -> None:
@@ -190,6 +221,31 @@ def cmd_uninstall(args):
     print("privacy-mask hook has been removed.")
 
 
+def cmd_on(args):
+    """Enable privacy-mask."""
+    _set_enabled(True)
+    print("[OK] privacy-mask is now ON — images will be masked before upload.")
+
+
+def cmd_off(args):
+    """Disable privacy-mask temporarily."""
+    _set_enabled(False)
+    print("[OK] privacy-mask is now OFF — images will NOT be masked.")
+    print("Run 'privacy-mask on' to re-enable.")
+
+
+def cmd_status(args):
+    """Show current privacy-mask status."""
+    enabled = _is_enabled()
+    hook_path = os.path.join(_get_hook_install_dir(), "privacy-mask.sh")
+    hook_installed = os.path.isfile(hook_path)
+
+    print(f"privacy-mask v{__version__}")
+    print(f"  Masking:   {'ON' if enabled else 'OFF'}")
+    print(f"  Hook:      {'installed' if hook_installed else 'not installed'}")
+    print(f"  State dir: {_get_state_dir()}")
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="privacy-mask",
@@ -215,6 +271,11 @@ def main():
     subparsers.add_parser("install", help="Install global Claude Code hook")
     subparsers.add_parser("uninstall", help="Remove global Claude Code hook")
 
+    # on / off / status
+    subparsers.add_parser("on", help="Enable masking")
+    subparsers.add_parser("off", help="Disable masking temporarily")
+    subparsers.add_parser("status", help="Show current status")
+
     args = parser.parse_args()
 
     if args.command == "mask":
@@ -223,6 +284,12 @@ def main():
         cmd_install(args)
     elif args.command == "uninstall":
         cmd_uninstall(args)
+    elif args.command == "on":
+        cmd_on(args)
+    elif args.command == "off":
+        cmd_off(args)
+    elif args.command == "status":
+        cmd_status(args)
     else:
         parser.print_help()
 

@@ -65,6 +65,13 @@ privacy-mask install
 
 That's it. After `privacy-mask install`, every image you share with your AI coding assistant is automatically masked before upload.
 
+```bash
+# Toggle masking on/off
+privacy-mask off       # Temporarily disable
+privacy-mask on        # Re-enable
+privacy-mask status    # Check current state
+```
+
 ---
 
 ## Agent Integration

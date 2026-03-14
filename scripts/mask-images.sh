@@ -10,6 +10,12 @@ STATE_DIR="$HOME/.claude/privacy-mask"
 mkdir -p "$STATE_DIR"
 MASKED_LIST="$STATE_DIR/masked.txt"
 LOG_FILE="$STATE_DIR/hook.log"
+ENABLED_FILE="$STATE_DIR/enabled"
+
+# Check if privacy-mask is disabled (enabled by default)
+if [ -f "$ENABLED_FILE" ] && [ "$(cat "$ENABLED_FILE" 2>/dev/null)" = "0" ]; then
+    exit 0
+fi
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG_FILE"

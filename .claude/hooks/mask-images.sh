@@ -6,8 +6,16 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 CACHE_DIR="$HOME/.claude/image-cache"
+STATE_DIR="$HOME/.claude/privacy-mask"
+mkdir -p "$STATE_DIR"
 MASKED_LIST="/tmp/masked_images_$(id -u).txt"
 LOG_FILE="/tmp/mask-images-hook.log"
+ENABLED_FILE="$STATE_DIR/enabled"
+
+# Check if privacy-mask is disabled (enabled by default)
+if [ -f "$ENABLED_FILE" ] && [ "$(cat "$ENABLED_FILE" 2>/dev/null)" = "0" ]; then
+    exit 0
+fi
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG_FILE"
