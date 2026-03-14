@@ -102,7 +102,7 @@
     },
     "IBAN": {
       "enabled": true,
-      "pattern": "[A-Z]{2}\\d{2}[\\s]?[\\dA-Z]{4}(?:[\\s]?[\\dA-Z]{4}){1,7}(?:[\\s]?[\\dA-Z]{1,4})?",
+      "pattern": "(?<![A-Za-z0-9])[A-Z]{2}\\d{2}(?:[\\s]?[\\dA-Z]{4}){2,7}(?:[\\s]?[\\dA-Z]{1,4})?(?![A-Za-z0-9])",
       "description": "International Bank Account Number"
     },
     "PEM_PRIVATE_KEY": {
@@ -149,6 +149,11 @@
       "enabled": true,
       "pattern": "(?<![A-Za-z0-9])(?:AKIA|ASIA)[0-9A-Z]{16}(?![A-Za-z0-9])",
       "description": "AWS access key ID"
+    },
+    "AWS_SECRET_KEY": {
+      "enabled": true,
+      "pattern": "(?:aws_secret_access_key|AWS_SECRET_ACCESS_KEY|SecretAccessKey|secret_access_key|AWSSecretKey|aws_secret_key)[\\s=:\"']+[A-Za-z0-9+/]{40}",
+      "description": "AWS secret access key (40-char base64 with label context)"
     },
     "GITHUB_TOKEN": {
       "enabled": true,

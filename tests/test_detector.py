@@ -26,7 +26,7 @@ def _make_rules():
         DetectionRule(name="WECHAT_ID", pattern=r"(?:微信|WeChat|wechat)[:\s：]*[a-zA-Z][a-zA-Z0-9_-]{5,19}", description="WeChat", enabled=True),
         DetectionRule(name="HKID", pattern=r"[A-Z]{1,2}\d{6}\(\d\)", description="HKID", enabled=True),
         DetectionRule(name="TWID", pattern=r"(?<![A-Za-z])[A-Z][12]\d{8}(?![A-Za-z0-9])", description="TWID", enabled=True),
-        DetectionRule(name="IBAN", pattern=r"[A-Z]{2}\d{2}[\s]?[\dA-Z]{4}(?:[\s]?[\dA-Z]{4}){1,7}(?:[\s]?[\dA-Z]{1,4})?", description="IBAN", enabled=True),
+        DetectionRule(name="IBAN", pattern=r"(?<![A-Za-z0-9])[A-Z]{2}\d{2}(?:[\s]?[\dA-Z]{4}){2,7}(?:[\s]?[\dA-Z]{1,4})?(?![A-Za-z0-9])", description="IBAN", enabled=True),
         DetectionRule(name="PEM_PRIVATE_KEY", pattern=r"-----BEGIN[\s\w]*(?:PRIVATE KEY|CERTIFICATE)-----", description="PEM key", enabled=True),
         DetectionRule(name="SSH_KEY", pattern=r"ssh-(?:rsa|ed25519|dsa|ecdsa)\s+[A-Za-z0-9+/=]{20,}", description="SSH key", enabled=True),
         DetectionRule(name="MAC_ADDRESS", pattern=r"(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}", description="MAC", enabled=True),
@@ -37,6 +37,7 @@ def _make_rules():
         DetectionRule(name="CREDIT_CARD_AMEX", pattern=r"(?<!\d)3[47]\d{2}[\s-]?\d{6}[\s-]?\d{5}(?!\d)", description="Amex", enabled=True),
         DetectionRule(name="PHONE_INTL", pattern=r"\+\d{1,3}[\s.-]?\(?\d{1,4}\)?[\s.-]?\d{2,4}[\s.-]?\d{2,4}[\s.-]?\d{0,4}", description="Intl phone", enabled=True),
         DetectionRule(name="AWS_ACCESS_KEY", pattern=r"(?<![A-Za-z0-9])(?:AKIA|ASIA)[0-9A-Z]{16}(?![A-Za-z0-9])", description="AWS key", enabled=True),
+        DetectionRule(name="AWS_SECRET_KEY", pattern=r"(?:aws_secret_access_key|AWS_SECRET_ACCESS_KEY|SecretAccessKey|secret_access_key|AWSSecretKey|aws_secret_key)[\s=:\"']+[A-Za-z0-9+/]{40}", description="AWS secret key", enabled=True),
         DetectionRule(name="GITHUB_TOKEN", pattern=r"(?<![A-Za-z0-9])(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36}(?![A-Za-z0-9])", description="GitHub token", enabled=True),
         DetectionRule(name="SLACK_TOKEN", pattern=r"(?<![A-Za-z0-9])xox[bpsa]-[A-Za-z0-9-]{10,}(?![A-Za-z0-9])", description="Slack token", enabled=True),
         DetectionRule(name="GOOGLE_API_KEY", pattern=r"(?<![A-Za-z0-9])AIza[A-Za-z0-9_-]{35}(?![A-Za-z0-9])", description="Google API key", enabled=True),
@@ -540,6 +541,35 @@ class TestIBAN:
         dets = detect_sensitive(ocr, _make_rules())
         assert not any(d.label == "IBAN" for d in dets)
 
+    def test_french_iban(self):
+        ocr = [_make_ocr("FR76 3000 6000 0112 3456 7890 189", 10, 10, w=300)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("IBAN" in d.label for d in dets)
+
+    def test_false_positive_english_text(self):
+        """Normal English text with numbers should not match IBAN."""
+        ocr = [_make_ocr("REQUIRED 1234", 10, 10, w=120)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "IBAN" for d in dets)
+
+    def test_false_positive_organization(self):
+        """Common uppercase words followed by numbers should not match."""
+        ocr = [_make_ocr("ORGANIZATION 5678", 10, 10, w=160)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "IBAN" for d in dets)
+
+    def test_false_positive_continue(self):
+        """Short country-code-like prefix with few digits should not match."""
+        ocr = [_make_ocr("CO12 NTINUE", 10, 10, w=100)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "IBAN" for d in dets)
+
+    def test_too_short_code_no_match(self):
+        """Two-letter code + 2 digits + only one 4-char group is too short for IBAN."""
+        ocr = [_make_ocr("AB12 CDEF", 10, 10, w=80)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "IBAN" for d in dets)
+
 
 class TestPEMPrivateKey:
     def test_rsa_private_key(self):
@@ -729,6 +759,56 @@ class TestAWSAccessKey:
         ocr = [_make_ocr("xAKIAIOSFODNN7EXAMPLE", 10, 10, w=200)]
         dets = detect_sensitive(ocr, _make_rules())
         assert not any(d.label == "AWS_ACCESS_KEY" for d in dets)
+
+
+class TestAWSSecretKey:
+    def _fake_secret(self):
+        """Build a 40-char base64-like secret at runtime to avoid push protection."""
+        return "wJalrXUtnFEMI" + "/K7MDENG" + "/bPxRfiCY" + "EXAMPLEKEY"
+
+    def test_aws_secret_access_key_label(self):
+        secret = self._fake_secret()
+        ocr = [_make_ocr(f"aws_secret_access_key = {secret}", 10, 10, w=400)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("AWS_SECRET_KEY" in d.label for d in dets)
+
+    def test_uppercase_label(self):
+        secret = self._fake_secret()
+        ocr = [_make_ocr(f"AWS_SECRET_ACCESS_KEY={secret}", 10, 10, w=400)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("AWS_SECRET_KEY" in d.label for d in dets)
+
+    def test_camelcase_label(self):
+        secret = self._fake_secret()
+        ocr = [_make_ocr(f"SecretAccessKey: {secret}", 10, 10, w=400)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("AWS_SECRET_KEY" in d.label for d in dets)
+
+    def test_secret_key_quoted(self):
+        secret = self._fake_secret()
+        ocr = [_make_ocr(f'aws_secret_access_key = "{secret}"', 10, 10, w=420)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert any("AWS_SECRET_KEY" in d.label for d in dets)
+
+    def test_no_label_no_match(self):
+        """A 40-char base64 string without a label should not match."""
+        secret = self._fake_secret()
+        ocr = [_make_ocr(secret, 10, 10, w=300)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "AWS_SECRET_KEY" for d in dets)
+
+    def test_short_value_no_match(self):
+        """A value shorter than 40 chars should not match."""
+        ocr = [_make_ocr("aws_secret_access_key = wJalrXUtnFEMI", 10, 10, w=300)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "AWS_SECRET_KEY" for d in dets)
+
+    def test_random_label_no_match(self):
+        """An unrelated label should not match."""
+        secret = self._fake_secret()
+        ocr = [_make_ocr(f"my_custom_field = {secret}", 10, 10, w=400)]
+        dets = detect_sensitive(ocr, _make_rules())
+        assert not any(d.label == "AWS_SECRET_KEY" for d in dets)
 
 
 class TestGitHubToken:
