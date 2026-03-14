@@ -3,14 +3,15 @@ name: privacy-mask
 description: >-
   Mask and redact sensitive information (PII) in screenshots and images before
   analysis — phone numbers, emails, IDs, API keys, crypto wallets, credit cards,
-  passwords, and more. Uses OCR (Tesseract / EasyOCR) to detect private data and
-  applies redaction overlays. All processing is 100% local and offline — no data
-  leaves your machine. Use when receiving screenshots that may contain private
-  data, or when the user mentions privacy / masking / redacting / PII removal /
-  sensitive data protection.
+  passwords, and more. Uses OCR (Tesseract + RapidOCR) and optional NER (GLiNER)
+  to detect private data and applies redaction overlays. One-time setup requires
+  pip install (network) and global hook registration; after that, all image
+  processing is fully local and offline — no data leaves your machine. Use when
+  receiving screenshots that may contain private data, or when the user mentions
+  privacy / masking / redacting / PII removal / sensitive data protection.
 version: 0.3.0
 license: MIT
-compatibility: Requires tesseract OCR and Python 3.10+. All processing is local and offline.
+compatibility: Requires tesseract OCR and Python 3.10+. One-time pip install requires network; all subsequent image processing is local and offline.
 metadata:
   author: wuhao
   openclaw:
@@ -21,22 +22,32 @@ metadata:
     emoji: "\U0001F6E1"
     homepage: https://github.com/fullstackcrew-alpha/privacy-mask
   permissions:
+    - id: pip-install
+      description: >-
+        One-time: runs "pip install privacy-mask" to install the CLI tool and
+        its dependencies (Pillow, pytesseract, rapidocr-onnxruntime) from PyPI.
+        This is the only step that requires network access.
+      scope: global
+      optional: false
     - id: global-hook-install
       description: >-
-        Installs a global Claude Code hook that intercepts images before upload.
-        The hook calls privacy-mask to redact sensitive regions in-place.
+        One-time: runs "privacy-mask install" to register a UserPromptSubmit
+        hook in ~/.claude/settings.json. The hook script is bundled in the
+        package at mask_engine/data/hook.sh — no remote code is fetched.
       scope: global
       optional: false
     - id: image-cache-read
       description: >-
-        Reads images from the local Claude Code cache directory to perform
-        OCR-based detection before the image is sent to the API.
+        At runtime, the hook reads images from ~/.claude/image-cache/ to
+        perform local OCR-based detection before the image is sent to the API.
+        Images are processed in-place; no copies are made or transmitted.
       scope: local
       optional: false
     - id: agent-behavior-modify
       description: >-
-        Modifies agent image-handling behavior by masking sensitive regions in
-        images before they are uploaded, ensuring PII never leaves the machine.
+        The hook masks (blurs) detected sensitive regions in images before
+        upload, ensuring PII never leaves the machine. This modifies the
+        image content that the agent sends to the API.
       scope: local
       optional: false
 ---
