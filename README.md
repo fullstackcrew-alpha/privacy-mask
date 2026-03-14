@@ -13,6 +13,8 @@
 
 > **Your images never leave your machine.** privacy-mask intercepts screenshots before they are sent to AI services, automatically detecting and masking phone numbers, ID cards, API keys, and 40+ other sensitive patterns.
 
+**[🇨🇳 中文文档 / Chinese Documentation](README.zh.md)**
+
 ---
 
 ## Demo
@@ -198,18 +200,7 @@ See the [bundled config.json](mask_engine/data/config.json) for all 47 rules.
 
 ## Contributing
 
-Contributions are welcome! Here's how you can help:
-
-- **Add detection rules** — submit new regex patterns for your country's ID format
-- **Improve OCR accuracy** — better preprocessing strategies
-- **Report false positives** — help us tune regex patterns
-- **Add tests** — currently 208 tests, always room for more
-
-```bash
-# Run tests
-pip install -e .
-python -m pytest tests/ -v
-```
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ---
 
@@ -217,35 +208,3 @@ python -m pytest tests/ -v
 
 MIT
 
----
-
-<details>
-<summary><strong>🇨🇳 中文说明</strong></summary>
-
-## privacy-mask — 本地图片隐私打码工具
-
-在截图发送给 AI 助手之前，自动检测并遮盖敏感信息。**100% 本地处理，数据不出本机。**
-
-### 特性
-
-- **47 条正则规则**，覆盖 15+ 国家的证件、电话、银行卡、开发者密钥等
-- **双 OCR 引擎**（Tesseract + RapidOCR），多策略预处理，置信度融合
-- **一键安装**：`pip install privacy-mask && privacy-mask install`
-- **兼容 20+ AI 编程工具**：Claude Code、Cursor、VS Code Copilot、Gemini CLI 等
-- 支持模糊和填充两种打码方式
-- 自定义规则配置
-
-### 快速开始
-
-```bash
-pip install privacy-mask
-privacy-mask mask screenshot.png          # 打码
-privacy-mask mask screenshot.png --dry-run # 仅检测
-privacy-mask install                       # 安装全局钩子，自动打码
-```
-
-### 为什么选择本地打码？
-
-云端脱敏工具需要上传你的图片——这本身就违背了隐私保护的初衷。privacy-mask 在图片离开你的电脑之前就完成打码，是真正保护隐私的唯一方案。
-
-</details>
