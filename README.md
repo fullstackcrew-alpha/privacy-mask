@@ -15,6 +15,14 @@
 
 ---
 
+## Demo
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/fullstackcrew-alpha/privacy-mask/main/examples/demo.gif" alt="privacy-mask demo" width="700">
+</p>
+
+---
+
 ## Before / After
 
 | Original | Masked |
