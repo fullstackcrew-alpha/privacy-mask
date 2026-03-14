@@ -1,6 +1,6 @@
 ---
 name: privacy-mask
-description: Mask sensitive information (phone numbers, emails, IDs, API keys, crypto wallets, etc.) in screenshots before analysis. Use when receiving screenshots that may contain private data, or when the user mentions privacy/masking/脱敏/打码.
+description: Mask sensitive information (phone numbers, emails, IDs, API keys, crypto wallets, etc.) in screenshots before analysis. Use when receiving screenshots that may contain private data, or when the user mentions privacy/masking/redacting.
 version: 0.1.0
 license: MIT
 compatibility: Requires tesseract OCR and Python 3.10+. All processing is local and offline.
@@ -22,7 +22,7 @@ Detect and mask sensitive information in images locally before they leave your m
 ## When to use
 
 - User sends a screenshot that may contain private data
-- User mentions privacy, masking, 脱敏, or 打码
+- User mentions privacy, masking, or redacting
 - You need to analyze an image but want to redact sensitive info first
 
 ## Quick start
