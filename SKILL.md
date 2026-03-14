@@ -1,11 +1,18 @@
 ---
 name: privacy-mask
 description: Mask sensitive information (phone numbers, emails, IDs, API keys, crypto wallets, etc.) in screenshots before analysis. Use when receiving screenshots that may contain private data, or when the user mentions privacy/masking/脱敏/打码.
+version: 0.1.0
 license: MIT
 compatibility: Requires tesseract OCR and Python 3.10+. All processing is local and offline.
 metadata:
   author: wuhao
-  version: "0.1.0"
+  openclaw:
+    requires:
+      bins:
+        - tesseract
+        - python3
+    emoji: "\U0001F6E1"
+    homepage: https://github.com/fullstackcrew-alpha/privacy-mask
 ---
 
 # Privacy Mask
