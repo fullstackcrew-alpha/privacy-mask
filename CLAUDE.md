@@ -27,6 +27,19 @@ gh auth switch -u fullstackcrew-alpha
 
 Switch back after if needed: `gh auth switch -u haowu77`
 
+## PyPI Publish
+
+PyPI 发布通过 GitHub Release 自动完成（CI workflow `.github/workflows/publish.yml`）：
+
+```bash
+gh auth switch -u fullstackcrew-alpha
+gh release create v<version> --title "v<version> — 描述" --notes "changelog"
+```
+
+- Token 存在 GitHub repo secrets (`PYPI_API_TOKEN`)，不需要本地凭证
+- **不要**用 `twine upload` 本地发布，直接创建 Release 即可
+- Release 会自动触发 build → check → publish 流程
+
 ## ClawHub Publish
 
 ```bash
@@ -41,10 +54,11 @@ clawhub publish . --version <semver> --tags "privacy,pii,masking,redaction,secur
 
 ### Version sync checklist
 
-When bumping versions, update **all three** locations:
-1. `SKILL.md` frontmatter `version` field
-2. `marketplace.json` `version` field
-3. The `--version` flag in the `clawhub publish` command
+When bumping versions, update **all four** locations:
+1. `pyproject.toml` `version` field
+2. `mask_engine/__init__.py` `__version__`
+3. `SKILL.md` frontmatter `version` field
+4. `marketplace.json` `version` field
 
 ### Discoverability tips
 
