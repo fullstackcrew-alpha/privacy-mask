@@ -1,0 +1,14 @@
+# Only publish SKILL.md and docs, exclude everything else
+hooks/
+scripts/
+tests/
+mask_engine/
+examples/
+.claude-plugin/
+.github/
+*.sh
+*.py
+*.toml
+*.txt
+*.json
+skills/
