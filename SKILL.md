@@ -1,7 +1,14 @@
 ---
 name: privacy-mask
-description: Mask sensitive information (phone numbers, emails, IDs, API keys, crypto wallets, etc.) in screenshots before analysis. Use when receiving screenshots that may contain private data, or when the user mentions privacy/masking/redacting.
-version: 0.1.0
+description: >-
+  Mask and redact sensitive information (PII) in screenshots and images before
+  analysis — phone numbers, emails, IDs, API keys, crypto wallets, credit cards,
+  passwords, and more. Uses OCR (Tesseract / EasyOCR) to detect private data and
+  applies redaction overlays. All processing is 100% local and offline — no data
+  leaves your machine. Use when receiving screenshots that may contain private
+  data, or when the user mentions privacy / masking / redacting / PII removal /
+  sensitive data protection.
+version: 0.2.4
 license: MIT
 compatibility: Requires tesseract OCR and Python 3.10+. All processing is local and offline.
 metadata:
@@ -13,6 +20,25 @@ metadata:
         - python3
     emoji: "\U0001F6E1"
     homepage: https://github.com/fullstackcrew-alpha/privacy-mask
+  permissions:
+    - id: global-hook-install
+      description: >-
+        Installs a global Claude Code hook that intercepts images before upload.
+        The hook calls privacy-mask to redact sensitive regions in-place.
+      scope: global
+      optional: false
+    - id: image-cache-read
+      description: >-
+        Reads images from the local Claude Code cache directory to perform
+        OCR-based detection before the image is sent to the API.
+      scope: local
+      optional: false
+    - id: agent-behavior-modify
+      description: >-
+        Modifies agent image-handling behavior by masking sensitive regions in
+        images before they are uploaded, ensuring PII never leaves the machine.
+      scope: local
+      optional: false
 ---
 
 # Privacy Mask
