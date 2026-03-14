@@ -48,6 +48,7 @@ def run_pipeline(
     config: Config | None = None,
     config_path: str | None = None,
     method: str | None = None,
+    engine: str | None = None,
     dry_run: bool = False,
 ) -> MaskResult:
     """Run the full privacy masking pipeline.
@@ -58,6 +59,7 @@ def run_pipeline(
         config: Optional Config object (loaded from config_path if None)
         config_path: Optional path to config.json
         method: Override masking method ('blur' or 'fill')
+        engine: Override OCR engine ('tesseract', 'rapidocr', or 'combined')
         dry_run: If True, detect but don't mask/save
     """
     if config is None:
@@ -65,6 +67,9 @@ def run_pipeline(
 
     if method:
         config.masking.method = method
+
+    if engine:
+        config.ocr.engine = engine
 
     if output_path is None:
         output_path = _generate_output_path(input_path, config)

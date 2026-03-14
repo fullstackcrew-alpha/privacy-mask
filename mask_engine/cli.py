@@ -107,6 +107,7 @@ def cmd_mask(args):
             output_path=args.output,
             config_path=args.config,
             method=args.method,
+            engine=args.engine,
             dry_run=args.dry_run,
         )
 
@@ -266,6 +267,7 @@ def main():
     mask_parser.add_argument("--method", "-m", choices=["blur", "fill"], help="Masking method")
     mask_parser.add_argument("--dry-run", "-d", action="store_true", help="Detect only, don't mask")
     mask_parser.add_argument("--config", "-c", help="Path to config.json")
+    mask_parser.add_argument("--engine", "-e", choices=["tesseract", "rapidocr", "combined"], help="OCR engine")
 
     # install / uninstall
     subparsers.add_parser("install", help="Install global Claude Code hook")

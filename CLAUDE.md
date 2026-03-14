@@ -17,6 +17,16 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests/ -v
 - `SKILL.md` — agentskills.io standard skill definition
 - `.claude-plugin/` / `hooks/` / `scripts/` — Claude Code plugin structure
 
+## GitHub Operations
+
+This repo belongs to `fullstackcrew-alpha`. Before any `gh` command (push, PR, topics, releases, etc.), switch to the correct account:
+
+```bash
+gh auth switch -u fullstackcrew-alpha
+```
+
+Switch back after if needed: `gh auth switch -u haowu77`
+
 ## Key Conventions
 
 - **No real secrets in source**: never write literal Stripe/AWS/GitHub test keys; use runtime string construction to avoid push protection triggers

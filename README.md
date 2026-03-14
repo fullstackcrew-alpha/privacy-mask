@@ -140,6 +140,9 @@ privacy-mask mask screenshot.png --dry-run
 # Black fill instead of blur
 privacy-mask mask screenshot.png --method fill
 
+# Choose OCR engine (tesseract, rapidocr, or combined)
+privacy-mask mask screenshot.png --engine tesseract
+
 # Custom config
 privacy-mask mask screenshot.png --config my_rules.json
 

@@ -140,6 +140,9 @@ privacy-mask mask screenshot.png --dry-run
 # 黑色填充代替模糊
 privacy-mask mask screenshot.png --method fill
 
+# 选择 OCR 引擎（tesseract、rapidocr 或 combined）
+privacy-mask mask screenshot.png --engine tesseract
+
 # 自定义配置
 privacy-mask mask screenshot.png --config my_rules.json
 
