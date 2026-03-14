@@ -53,8 +53,11 @@ This matters for compliance too: **GDPR**, **HIPAA**, and other regulations requ
 ## Quick Start
 
 ```bash
-# Install
+# Install (regex engine only)
 pip install privacy-mask
+
+# Install with NER engine (recommended)
+pip install privacy-mask[ner]
 
 # Mask a screenshot
 privacy-mask mask screenshot.png
@@ -96,7 +99,43 @@ privacy-mask follows the [agentskills.io](https://agentskills.io) SKILL.md stand
 
 ---
 
+## Detection Engines
+
+privacy-mask supports two detection engines, switchable via config or CLI:
+
+| Engine | Description | Install |
+|--------|-------------|---------|
+| **NER** (default) | Zero-shot Named Entity Recognition via [GLiNER](https://github.com/urchade/GLiNER). Detects person names, addresses, organizations, dates of birth, medical conditions, and more — without regex. | `pip install privacy-mask[ner]` |
+| **Regex** | 47 hand-tuned regex rules covering 15+ countries. No extra dependencies. | `pip install privacy-mask` |
+
+```bash
+# Default: NER engine (requires privacy-mask[ner])
+privacy-mask mask screenshot.png
+
+# Switch to regex engine
+privacy-mask mask screenshot.png --detection-engine regex
+```
+
+You can also set the default engine in `config.json`:
+
+```json
+{
+  "detection": { "engine": "ner" }
+}
+```
+
+---
+
 ## What It Detects
+
+### NER Engine
+
+Configurable entity types (zero-shot, no training needed):
+- Person names, street addresses, organization names
+- Dates of birth, medical conditions, license plate numbers
+- Custom entity types via `config.json` `ner.entity_types`
+
+### Regex Engine
 
 **47 regex rules** covering **15+ countries**:
 
@@ -119,9 +158,13 @@ privacy-mask follows the [agentskills.io](https://agentskills.io) SKILL.md stand
 
 1. **OCR** — Dual-engine: Tesseract + RapidOCR extract text with bounding boxes. Multi-strategy preprocessing (grayscale, binarization, contrast enhancement) with confidence-based merge for maximum accuracy.
 
-2. **Detect** — 47 compiled regex rules scan OCR results. Overlapping detections on nearby bounding boxes are merged automatically.
+2. **Line Grouping** — OCR results are grouped into logical text lines using vertical overlap analysis.
 
-3. **Mask** — Matched regions are blurred (default) or filled with solid color. Output is saved as a new file or overwrites the original.
+3. **Detect** — Switchable engine:
+   - **NER** (default) — GLiNER zero-shot NER identifies entities (names, addresses, etc.) without regex
+   - **Regex** — 47 compiled regex rules scan for structured patterns (IDs, phone numbers, API keys)
+
+4. **Mask** — Matched regions are blurred (default) or filled with solid color. Output is saved as a new file or overwrites the original.
 
 ---
 
@@ -142,6 +185,9 @@ privacy-mask mask screenshot.png --method fill
 
 # Choose OCR engine (tesseract, rapidocr, or combined)
 privacy-mask mask screenshot.png --engine tesseract
+
+# Choose detection engine (ner or regex)
+privacy-mask mask screenshot.png --detection-engine regex
 
 # Custom config
 privacy-mask mask screenshot.png --config my_rules.json

@@ -8,7 +8,7 @@ description: >-
   leaves your machine. Use when receiving screenshots that may contain private
   data, or when the user mentions privacy / masking / redacting / PII removal /
   sensitive data protection.
-version: 0.2.4
+version: 0.3.0
 license: MIT
 compatibility: Requires tesseract OCR and Python 3.10+. All processing is local and offline.
 metadata:

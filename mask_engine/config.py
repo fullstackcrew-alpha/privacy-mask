@@ -40,11 +40,29 @@ class DetectionRule:
 
 
 @dataclass
+class NerConfig:
+    model_name: str = "gliner-community/gliner_small-v2.5"
+    entity_types: list[str] = field(default_factory=lambda: [
+        "person name", "street address", "organization name",
+        "date of birth", "medical condition", "license plate number",
+    ])
+    confidence_threshold: float = 0.5
+    max_text_length: int = 512
+
+
+@dataclass
+class DetectionConfig:
+    engine: str = "ner"  # "regex" or "ner"
+
+
+@dataclass
 class Config:
     detection_rules: list[DetectionRule] = field(default_factory=list)
     masking: MaskingConfig = field(default_factory=MaskingConfig)
     ocr: OcrConfig = field(default_factory=OcrConfig)
     output: OutputConfig = field(default_factory=OutputConfig)
+    detection: DetectionConfig = field(default_factory=DetectionConfig)
+    ner: NerConfig = field(default_factory=NerConfig)
 
 
 def load_config(config_path: str | None = None) -> Config:
@@ -84,9 +102,24 @@ def load_config(config_path: str | None = None) -> Config:
         format=output_data.get("format", "png"),
     )
 
+    detection_data = data.get("detection", {})
+    detection = DetectionConfig(
+        engine=detection_data.get("engine", "ner"),
+    )
+
+    ner_data = data.get("ner", {})
+    ner = NerConfig(
+        model_name=ner_data.get("model_name", "gliner-community/gliner_small-v2.5"),
+        entity_types=ner_data.get("entity_types", NerConfig().entity_types),
+        confidence_threshold=ner_data.get("confidence_threshold", 0.5),
+        max_text_length=ner_data.get("max_text_length", 512),
+    )
+
     return Config(
         detection_rules=rules,
         masking=masking,
         ocr=ocr,
         output=output,
+        detection=detection,
+        ner=ner,
     )

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "privacy-mask"
-version = "0.2.0"
+version = "0.3.0"
 description = "Local image privacy masking — detect and redact sensitive info (IDs, phones, keys, etc.) before images leave your machine."
 readme = "README.md"
 license = {text = "MIT"}
@@ -26,6 +26,9 @@ dependencies = [
     "pytesseract>=0.3.10",
     "rapidocr-onnxruntime>=1.2.0",
 ]
+
+[project.optional-dependencies]
+ner = ["gliner>=0.2.0"]
 
 [project.scripts]
 privacy-mask = "mask_engine.cli:main"

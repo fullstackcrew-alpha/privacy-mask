@@ -2,6 +2,7 @@
 
 import os
 import shutil
+import sys
 import tempfile
 from dataclasses import dataclass, field
 
@@ -50,6 +51,7 @@ def run_pipeline(
     method: str | None = None,
     engine: str | None = None,
     dry_run: bool = False,
+    detection_engine: str | None = None,
 ) -> MaskResult:
     """Run the full privacy masking pipeline.
 
@@ -61,6 +63,7 @@ def run_pipeline(
         method: Override masking method ('blur' or 'fill')
         engine: Override OCR engine ('tesseract', 'rapidocr', or 'combined')
         dry_run: If True, detect but don't mask/save
+        detection_engine: Override detection engine ('regex' or 'ner')
     """
     if config is None:
         config = load_config(config_path)
@@ -70,6 +73,9 @@ def run_pipeline(
 
     if engine:
         config.ocr.engine = engine
+
+    if detection_engine:
+        config.detection.engine = detection_engine
 
     if output_path is None:
         output_path = _generate_output_path(input_path, config)
@@ -81,7 +87,23 @@ def run_pipeline(
         config.ocr.engine, multi_preprocess=config.ocr.multi_preprocess,
     )
 
-    detections = detect_sensitive(ocr_results, config.detection_rules)
+    if config.detection.engine == "ner":
+        try:
+            from .ner import detect_sensitive_ner
+            detections = detect_sensitive_ner(ocr_results, config.ner)
+        except ImportError:
+            if detection_engine == "ner":
+                # User explicitly asked for NER — don't silently fall back
+                raise
+            # Auto-fallback: NER not available, use regex instead
+            print(
+                "[privacy-mask] NER engine not available, falling back to regex. "
+                "Install NER support: pip install privacy-mask[ner]",
+                file=sys.stderr,
+            )
+            detections = detect_sensitive(ocr_results, config.detection_rules)
+    else:
+        detections = detect_sensitive(ocr_results, config.detection_rules)
 
     if not detections:
         summary = "No sensitive information detected."

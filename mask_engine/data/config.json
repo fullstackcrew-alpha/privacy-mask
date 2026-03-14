@@ -241,6 +241,22 @@
       "description": "Bitcoin wallet address"
     }
   },
+  "detection": {
+    "engine": "ner"
+  },
+  "ner": {
+    "model_name": "gliner-community/gliner_small-v2.5",
+    "entity_types": [
+      "person name",
+      "street address",
+      "organization name",
+      "date of birth",
+      "medical condition",
+      "license plate number"
+    ],
+    "confidence_threshold": 0.5,
+    "max_text_length": 512
+  },
   "masking": {
     "method": "blur",
     "blur_radius": 20,

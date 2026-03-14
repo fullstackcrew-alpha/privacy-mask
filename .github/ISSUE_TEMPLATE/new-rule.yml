@@ -1,0 +1,69 @@
+name: New Detection Rule
+description: Propose a new regex detection rule for a sensitive data pattern
+labels: ["new-rule"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Adding detection rules is the most common contribution to privacy-mask.
+        Please provide the details below so we can evaluate and add it.
+
+  - type: input
+    id: name
+    attributes:
+      label: Rule name
+      description: Short identifier (e.g. `US_DRIVER_LICENSE`, `FRENCH_SSN`)
+      placeholder: COUNTRY_TYPE
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What does this rule detect?
+      description: Describe the sensitive data type and which countries/regions it applies to
+      placeholder: "French social security number (numéro de sécurité sociale) — 15 digits"
+    validations:
+      required: true
+
+  - type: input
+    id: pattern
+    attributes:
+      label: Regex pattern
+      description: >
+        The regex pattern to match. Use Python regex syntax.
+        Remember to test for false positives against common English words.
+      placeholder: '(?<!\d)\d{3}-\d{2}-\d{4}(?!\d)'
+    validations:
+      required: true
+
+  - type: textarea
+    id: positive
+    attributes:
+      label: Positive test cases (should match)
+      description: List strings that should be detected by this rule
+      placeholder: |
+        - 1 85 07 91 234 089 72
+        - 2 99 05 12 345 678 23
+    validations:
+      required: true
+
+  - type: textarea
+    id: negative
+    attributes:
+      label: Negative test cases (should NOT match)
+      description: >
+        List strings that look similar but should NOT trigger this rule.
+        Think about common OCR artifacts and English words.
+      placeholder: |
+        - ORGANIZATION
+        - REQUIRED
+        - 123456
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Links to documentation about this data format

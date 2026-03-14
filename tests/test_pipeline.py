@@ -7,7 +7,7 @@ import pytest
 from PIL import Image, ImageDraw
 
 from mask_engine.pipeline import run_pipeline, _generate_output_path
-from mask_engine.config import Config, MaskingConfig, OcrConfig, OutputConfig, DetectionRule
+from mask_engine.config import Config, MaskingConfig, OcrConfig, OutputConfig, DetectionRule, DetectionConfig
 
 
 def _create_test_image_with_phone(path: str):
@@ -46,7 +46,7 @@ class TestPipeline:
             output_path = os.path.join(tmpdir, "test_masked.png")
             _create_test_image_with_phone(input_path)
 
-            result = run_pipeline(input_path, output_path=output_path)
+            result = run_pipeline(input_path, output_path=output_path, detection_engine="regex")
 
             assert os.path.exists(output_path)
             assert result.output_path == output_path
@@ -58,7 +58,7 @@ class TestPipeline:
             input_path = os.path.join(tmpdir, "test.png")
             _create_test_image_with_phone(input_path)
 
-            result = run_pipeline(input_path, dry_run=True)
+            result = run_pipeline(input_path, dry_run=True, detection_engine="regex")
 
             assert result.dry_run is True
             assert result.output_path is None
@@ -70,7 +70,7 @@ class TestPipeline:
             output_path = os.path.join(tmpdir, "clean_masked.png")
             _create_clean_image(input_path)
 
-            result = run_pipeline(input_path, output_path=output_path)
+            result = run_pipeline(input_path, output_path=output_path, detection_engine="regex")
 
             assert result.summary == "No sensitive information detected."
             assert os.path.exists(output_path)
@@ -82,6 +82,6 @@ class TestPipeline:
             output_path = os.path.join(tmpdir, "test_masked.png")
             _create_test_image_with_phone(input_path)
 
-            result = run_pipeline(input_path, output_path=output_path, method="fill")
+            result = run_pipeline(input_path, output_path=output_path, method="fill", detection_engine="regex")
 
             assert os.path.exists(output_path)

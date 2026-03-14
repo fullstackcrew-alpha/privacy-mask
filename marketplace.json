@@ -4,7 +4,7 @@
       "name": "privacy-mask",
       "repo": "fullstackcrew-alpha/privacy-mask",
       "description": "Auto-mask sensitive info in images before AI upload. 100% local, 47 regex rules, dual OCR engine.",
-      "version": "0.2.4",
+      "version": "0.3.0",
       "keywords": ["privacy", "pii", "masking", "redaction", "security", "ocr", "screenshot", "sensitive-data", "data-protection", "offline", "local", "claude-code", "api-keys", "secrets"]
     }
   ]
