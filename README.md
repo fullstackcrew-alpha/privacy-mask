@@ -90,7 +90,7 @@ privacy-mask follows the [agentskills.io](https://agentskills.io) SKILL.md stand
 | **aider** | CLI available via shell |
 | **Cline** | SKILL.md auto-detected |
 | **Windsurf** | SKILL.md auto-detected |
-| **OpenClaw** | SKILL.md auto-detected |
+| **OpenClaw** | `clawhub install privacy-mask` or SKILL.md auto-detected |
 
 > **Note:** privacy-mask only works with **local agents**. Web-based AI (ChatGPT Web, Gemini Web) uploads images to cloud servers before processing — local masking cannot help there. This tool is designed for agents that run on your machine.
 
