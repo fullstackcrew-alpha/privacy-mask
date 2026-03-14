@@ -113,15 +113,9 @@ privacy-mask follows the [agentskills.io](https://agentskills.io) SKILL.md stand
 
 ## How It Works
 
-```
-┌──────────┐     ┌───────────┐     ┌──────────┐     ┌──────────────┐
-│  Image   │────▶│    OCR    │────▶│  Detect  │────▶│     Mask     │
-│  Input   │     │ Tesseract │     │ 47 Regex │     │ Blur / Fill  │
-│          │     │ + Rapid   │     │  Rules   │     │              │
-└──────────┘     └───────────┘     └──────────┘     └──────────────┘
-                  Extract text      Match patterns    Redact regions
-                  + bounding boxes  with positions    in original image
-```
+<p align="center">
+  <img src="https://raw.githubusercontent.com/fullstackcrew-alpha/privacy-mask/main/examples/architecture.svg" alt="Architecture" width="700">
+</p>
 
 1. **OCR** — Dual-engine: Tesseract + RapidOCR extract text with bounding boxes. Multi-strategy preprocessing (grayscale, binarization, contrast enhancement) with confidence-based merge for maximum accuracy.
 
