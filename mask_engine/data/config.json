@@ -249,12 +249,10 @@
     "entity_types": [
       "person name",
       "street address",
-      "organization name",
       "date of birth",
-      "medical condition",
-      "license plate number"
+      "medical condition"
     ],
-    "confidence_threshold": 0.5,
+    "confidence_threshold": 0.6,
     "max_text_length": 512
   },
   "masking": {

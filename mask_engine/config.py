@@ -43,10 +43,10 @@ class DetectionRule:
 class NerConfig:
     model_name: str = "gliner-community/gliner_small-v2.5"
     entity_types: list[str] = field(default_factory=lambda: [
-        "person name", "street address", "organization name",
-        "date of birth", "medical condition", "license plate number",
+        "person name", "street address",
+        "date of birth", "medical condition",
     ])
-    confidence_threshold: float = 0.5
+    confidence_threshold: float = 0.6
     max_text_length: int = 512
 
 
