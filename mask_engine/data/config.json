@@ -21,7 +21,7 @@
       "description": "Birthday date (YYYY-MM-DD etc)"
     },
     "IP_ADDRESS": {
-      "enabled": true,
+      "enabled": false,
       "pattern": "(?:(?:25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.){3}(?:25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)",
       "description": "IPv4 address"
     },
@@ -46,12 +46,12 @@
       "description": "Date with month name (EN/FR, 2-4 digit year, e.g. 19DEC1996, 23 APR/AVR 87)"
     },
     "MRZ_LINE1": {
-      "enabled": true,
+      "enabled": false,
       "pattern": "P[<«.O0][A-Z]{3}[A-Z<«.]{5,}",
       "description": "Passport MRZ line 1 (ICAO standard)"
     },
     "MRZ_LINE2": {
-      "enabled": true,
+      "enabled": false,
       "pattern": "(?=[A-Z0-9<«]*[<«])[A-Z0-9<«]{30,}",
       "description": "Passport MRZ line 2 (30+ chars with MRZ chevron separators)"
     },
@@ -76,12 +76,12 @@
       "description": "Chinese date format (YYYY年MM月DD日)"
     },
     "URL_AUTH_TOKEN": {
-      "enabled": true,
+      "enabled": false,
       "pattern": "https?://[^\\s]*[?&](?:token|access_token|auth|session|jwt|key|secret|code|password)=[^\\s&]{8,}",
       "description": "URL with authentication token parameter"
     },
     "QQ_NUMBER": {
-      "enabled": true,
+      "enabled": false,
       "pattern": "(?:QQ|qq)[:\\s：]*\\d{5,12}",
       "description": "QQ number"
     },
@@ -116,17 +116,17 @@
       "description": "SSH public key"
     },
     "MAC_ADDRESS": {
-      "enabled": true,
+      "enabled": false,
       "pattern": "(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}",
       "description": "MAC address"
     },
     "UUID": {
-      "enabled": true,
+      "enabled": false,
       "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
       "description": "UUID"
     },
     "IPV6": {
-      "enabled": true,
+      "enabled": false,
       "pattern": "(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}",
       "description": "IPv6 address"
     },
