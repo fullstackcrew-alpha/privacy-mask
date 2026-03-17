@@ -1,6 +1,6 @@
 """Local Image Privacy Mask Engine."""
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
 from .ocr import OcrResult, run_ocr
 from .detector import Detection, detect_sensitive
