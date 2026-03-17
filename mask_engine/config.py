@@ -46,8 +46,9 @@ class NerConfig:
         "person name", "street address",
         "date of birth", "medical condition",
     ])
-    confidence_threshold: float = 0.6
+    confidence_threshold: float = 0.7
     max_text_length: int = 512
+    min_word_count: int = 2  # minimum words for person name to reduce single-word false positives
 
 
 @dataclass

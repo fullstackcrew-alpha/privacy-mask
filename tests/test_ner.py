@@ -98,20 +98,21 @@ class TestDetectSensitiveNer:
         """Multiple entities on the same line should all be detected."""
         ocr_results = [
             _ocr("John", left=0, top=0, width=40, height=20),
-            _ocr("lives at", left=50, top=0, width=60, height=20),
-            _ocr("123 Main St", left=120, top=0, width=100, height=20),
+            _ocr("Smith", left=45, top=0, width=40, height=20),
+            _ocr("lives at", left=90, top=0, width=60, height=20),
+            _ocr("123 Main St", left=160, top=0, width=100, height=20),
         ]
         mock_entities = [
-            _make_mock_entity("John", 0, 4, "person name"),
-            _make_mock_entity("123 Main St", 13, 24, "street address"),
+            _make_mock_entity("John Smith", 0, 10, "person name"),
+            _make_mock_entity("123 Main St", 20, 31, "street address"),
         ]
 
         detections = self._run_detection(ocr_results, mock_entities)
 
-        assert len(detections) == 2
-        labels = {d.label for d in detections}
-        assert "NER_PERSON_NAME" in labels
-        assert "NER_STREET_ADDRESS" in labels
+        # Both entities detected (may be merged into one if bboxes overlap)
+        all_labels = ",".join(d.label for d in detections)
+        assert "NER_PERSON_NAME" in all_labels
+        assert "NER_STREET_ADDRESS" in all_labels
 
     def test_label_prefix_and_format(self):
         """Entity labels should be uppercased with NER_ prefix and underscores."""

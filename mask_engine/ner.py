@@ -74,6 +74,13 @@ def detect_sensitive_ner(
             label = "NER_" + entity["label"].upper().replace(" ", "_")
             matched_text = entity["text"]
 
+            # Filter out single-word person names to reduce false positives
+            # (browser tabs, usernames, button labels often match as person name)
+            if label == "NER_PERSON_NAME":
+                word_count = len(matched_text.strip().split())
+                if word_count < ner_config.min_word_count:
+                    continue
+
             bbox = _find_covering_bboxes(start, end, mapping)
             detections.append(Detection(
                 label=label,
