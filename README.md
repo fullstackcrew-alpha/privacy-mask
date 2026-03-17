@@ -99,6 +99,53 @@ privacy-mask follows the [agentskills.io](https://agentskills.io) SKILL.md stand
 
 ---
 
+## Troubleshooting
+
+### `UserPromptSubmit hook error`
+
+If you see this error when sending images in Claude Code, it means the privacy-mask hook **timed out** before finishing. This is a known issue — the NER engine needs time to load the GLiNER model (~170MB) on first run. The image is usually still masked successfully despite the error message.
+
+**Fix: increase the hook timeout** in `~/.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/privacy-mask.sh",
+            "timeout": 60000
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The default timeout is 30000ms (30s). We recommend **60000ms (60s)** for NER engine, or 30000ms if you only use the regex engine.
+
+**Alternative: switch to regex engine** for faster processing (~2-5s vs ~20-30s):
+
+```bash
+# Edit ~/.claude/hooks/privacy-mask.sh or config.json
+# Set detection engine to regex
+privacy-mask mask screenshot.png --detection-engine regex
+```
+
+To change the default engine, edit `mask_engine/data/config.json`:
+
+```json
+{
+  "detection": { "engine": "regex" }
+}
+```
+
+---
+
 ## Detection Engines
 
 privacy-mask supports two detection engines, switchable via config or CLI:
