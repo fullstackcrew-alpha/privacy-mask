@@ -1,16 +1,21 @@
 ---
 name: privacy-mask
 description: Mask sensitive information (phone numbers, emails, IDs, API keys, crypto wallets, etc.) in screenshots before analysis. Use when receiving screenshots that may contain private data, or when the user mentions privacy/masking/脱敏/打码.
+version: 0.3.3
 license: MIT
-compatibility: Requires tesseract OCR and Python 3.10+. All processing is local and offline.
+compatibility: Requires tesseract OCR, Python 3.10+, and pre-installed privacy-mask CLI.
 metadata:
   author: wuhao
-  version: "0.2.0"
 ---
 
 # Privacy Mask
 
 Detect and mask sensitive information in images locally before they leave your machine.
+
+## Prerequisites
+
+This skill requires the `privacy-mask` CLI to be pre-installed on the system.
+If it is not available, inform the user that they need to install it first.
 
 ## When to use
 
@@ -34,6 +39,7 @@ Mask an image:
 privacy-mask mask <image_path>
 privacy-mask mask <image_path> --in-place
 privacy-mask mask <image_path> --dry-run   # detect only
+privacy-mask mask <image_path> --detection-engine regex  # use regex instead of NER
 ```
 
 Output is JSON:
@@ -45,7 +51,7 @@ Output is JSON:
 }
 ```
 
-## What it detects (47 rules)
+## What it detects
 
 - **IDs**: Chinese ID card, passport, HK/TW ID, US SSN, UK NINO, Canadian SIN, Indian Aadhaar/PAN, Korean RRN, Singapore NRIC, Malaysian IC
 - **Phone**: Chinese mobile/landline, US phone, international (+prefix)
@@ -53,6 +59,7 @@ Output is JSON:
 - **Developer keys**: AWS, GitHub, Slack, Google, Stripe tokens, JWT, connection strings, API keys, SSH/PEM keys
 - **Crypto**: Bitcoin, Ethereum wallet addresses
 - **Other**: Email, birthday, IP/IPv6, MAC, UUID, license plate, MRZ, URL auth tokens
+- **NER** (optional): Person names, street addresses, organizations, dates of birth, medical conditions
 
 ## Important
 
