@@ -1,4 +1,5 @@
 # Only publish SKILL.md + essential docs, exclude everything else
+.claude/
 hooks/
 scripts/
 tests/
