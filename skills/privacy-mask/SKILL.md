@@ -6,7 +6,7 @@ description: >-
   passwords, and more. 100% local, 100% offline. Uses OCR with 47 regex rules
   and optional NER. Use when receiving screenshots that may contain private data,
   or when the user mentions privacy/masking/脱敏/打码.
-version: 0.3.3
+version: 0.3.4
 license: MIT
 compatibility: Requires tesseract OCR, Python 3.10+, and pre-installed privacy-mask CLI.
 metadata:
