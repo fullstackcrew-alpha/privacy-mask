@@ -8,7 +8,7 @@ description: >-
   data and applies blur/fill redaction overlays. Supports GDPR and
   compliance workflows, secret detection, and data loss prevention (DLP).
   All processing runs 100% locally and offline — no data leaves your machine.
-version: 0.3.4
+version: 0.3.5
 license: MIT
 compatibility: Requires tesseract OCR, Python 3.10+, and pre-installed privacy-mask CLI.
 metadata:
